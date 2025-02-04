@@ -87,6 +87,5 @@ def update_graph(chosen_value):
         )
         return fig
 
-
 if __name__ == "__main__":
     app.run_server(debug=True)
