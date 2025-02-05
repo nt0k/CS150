@@ -27,14 +27,12 @@ for other_df in df_list[1:]:
 # Sort by date
 df = df.sort_values(by="Date")
 
-# Melt data to fit format needed for unique coloring
-df_long = pd.melt(df, id_vars=["Date"], value_vars=["Daily Max 8-hour CO Concentration", "Daily AQI Value",
-                                                     "Daily Max 1-hour NO2 Concentration", "Daily Max 8-hour Ozone Concentration",
-                                                     "Daily Mean PM2.5 Concentration", "Daily Max 1-hour SO2 Concentration"],
-                  var_name="Pollutant", value_name="Concentration")
-
-# Display DataFrame
-print(df_long.head().to_string())
+# Adjust data so that it can filter for user input easier
+df_long = pd.melt(df, id_vars=["Date"],
+                  value_vars=["Daily Max 8-hour CO Concentration", "Daily AQI Value",
+                    "Daily Max 1-hour NO2 Concentration", "Daily Max 8-hour Ozone Concentration",
+                    "Daily Mean PM2.5 Concentration", "Daily Max 1-hour SO2 Concentration"],
+                    var_name="Pollutant", value_name="Concentration")
 
 # App Layout **************************************************************
 
@@ -45,27 +43,30 @@ app.layout = html.Div(
     [
         html.Div(
             html.H1(
-                "Idaho Air Pollution", style={"textAlign": "center"}
+                "Idaho Air Pollutant Levels", style={"textAlign": "center"}
             ),
             className="row",
         ),
         html.Div(dcc.Graph(id="line-chart", figure={}), className="row"),
         html.Div(
+            html.H3("Select Pollutant", style={"textAlign": "center"})
+        ),
+        html.Div(
             [
                 html.Div(
                     dcc.Dropdown(
                         id="my-dropdown",
-                        multi=True,
                         options=[
                             {"label": x, "value": x}
                             for x in sorted(df_long["Pollutant"].unique())
                         ],
-                        value=["Daily AQI Value"],
+                        value="Daily AQI Value"
                     ),
                     className="three columns",
                 ),
             ],
             className="row",
+            style={"display": "flex", "justifyContent": "center"}
         ),
     ]
 )
@@ -82,16 +83,18 @@ def update_graph(chosen_value):
     if len(chosen_value) == 0:
         return {}
     else:
-        df_filtered = df_long[df_long["Pollutant"].isin(chosen_value)]
+        df_filtered = df_long[df_long["Pollutant"] == chosen_value]
         fig = px.line(
             data_frame=df_filtered,
             x= "Date",
             y= "Concentration",
-            color="Pollutant",
-            log_y=True,
-            labels={
-                "Daily AQI Value": "AQI",
-            },
+            line_shape= "spline"
+        )
+        fig.update_layout(
+            yaxis=dict(
+                tickmode="linear",  # Auto-tick mode to avoid clutter
+                dtick=30  # Adjust this number to control how many y-axis labels appear
+            )
         )
         return fig
 
