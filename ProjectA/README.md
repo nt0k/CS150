@@ -1,5 +1,5 @@
 ## Project A
----
+
 **Author**: Nathan Kirk, nkirk@westmont.edu
 
 **Class**: CS150 - Community Action Computing
