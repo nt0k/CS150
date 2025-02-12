@@ -4,11 +4,8 @@ Class: CS150 - Community Action Computing
 Instructor: Mike Ryu, Dongyub.Ryu@gmail.com
 Credit: Based on twitter_app.py from The Book of Dash
 """
-import random
-
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 from dash import Dash, dcc, html, Input, Output
 
 # Preparing your data for usage *******************************************
@@ -21,6 +18,7 @@ df5 = pd.read_csv("assets/Idaho_2023_SO2.csv", usecols=["Date", "Daily Max 1-hou
 df_list = [df1, df2, df3, df4, df5]
 
 df = df_list[0]
+# Merge CSVs together
 for other_df in df_list[1:]:
     df = df.merge(other_df, on="Date", how="outer")
 
@@ -53,7 +51,7 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [  # Added list to wrap multiple children
+                    [
                         html.H3("Select Pollutant", style={"textAlign": "center"}),
                         dcc.Dropdown(
                             id="my-dropdown",
@@ -63,14 +61,14 @@ app.layout = html.Div(
                             ],
                             value="Daily AQI Value",
                         ),
-                    ],  # End of the list
+                    ],
                     className="three columns",
                 ),
-                html.Div(  # Text Box/Display Area
+                html.Div(
                     html.Div(id="storyText",
                              children="Idaho's AQI ranges from 2-7, significantly under the national average of 35!"
                                       " Other pollutants are also under the average."),
-                    className="three columns",  # Occupy half the row (adjust as needed)
+                    className="three columns",
                     style={"border": "1px solid #ccc", "padding": "5px", "text-align": "center"}
                 ),
             ],
@@ -79,16 +77,12 @@ app.layout = html.Div(
         ),
     ]
 )
-
-
 # Callbacks ***************************************************************
 @app.callback(
     Output(component_id="line-chart", component_property="figure"),
     [Input(component_id="my-dropdown", component_property="value")],
 )
 def update_graph(chosen_value):
-    print(f"Values chosen by user: {chosen_value}")
-
     if len(chosen_value) == 0:
         return {}
     else:
@@ -112,7 +106,5 @@ def update_graph(chosen_value):
             tickformat="%m-%Y"
         )
         return fig
-
-
 if __name__ == "__main__":
     app.run_server(debug=True)
