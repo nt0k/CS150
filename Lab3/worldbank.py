@@ -10,7 +10,7 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 indicators = {
     "IT.NET.USER.ZS": "Individuals using the Internet (% of population)",
     "SG.GEN.PARL.ZS": "Proportion of seats held by women in national parliaments (%)",
-    "EN.ATM.CO2E.KT": "CO2 emissions (kt)",
+    "SP.URB.TOTL.IN.ZS": "Urban population (% of total population)",
 }
 
 # get country name and ISO id for mapping on choropleth
@@ -19,6 +19,7 @@ countries["capitalCity"].replace({"": None}, inplace=True)
 countries.dropna(subset=["capitalCity"], inplace=True)
 countries = countries[["name", "iso3c"]]
 countries = countries[countries["name"] != "Kosovo"]
+countries = countries[countries["name"] != "Korea, Dem. People's Rep."]
 countries = countries.rename(columns={"name": "country"})
 
 
@@ -103,7 +104,7 @@ app.layout = dbc.Container(
                             children="Submit",
                             n_clicks=0,
                             color="primary",
-                            className="mt-4",
+                            className="mt-4 fw-bold",
                         ),
                     ],
                     width=6,
@@ -135,6 +136,7 @@ def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
 
     if years_chosen[0] != years_chosen[1]:
         dff = dff[dff.year.between(years_chosen[0], years_chosen[1])]
+        print(dff.head().to_string())
         dff = dff.groupby(["iso3c", "country"])[indct_chosen].mean()
         dff = dff.reset_index()
 
