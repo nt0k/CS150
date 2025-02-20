@@ -126,6 +126,8 @@ app.layout = dbc.Container(
         ),
     ],
 )
+
+
 @app.callback(Output("storage", "data"),
               Input("timer", "n_intervals")
               )
@@ -138,6 +140,7 @@ def store_data(n_time):
     Output("my-choropleth", "figure"),
     Output("last-run", "children"),
     Output("click-count", "children"),
+    Output("years-range", "value"),
     Input("my-button", "n_clicks"),
     Input("storage", "data"),
     State("years-range", "value"),
@@ -146,9 +149,12 @@ def store_data(n_time):
 def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
     dff = pd.DataFrame.from_records(stored_dataframe)
 
-    currentDate = datetime.datetime.now().date().strftime("%Y-%m-%d")
+    currentDate = datetime.datetime.now().date().strftime("%m-%d-%Y")
     currentTime = datetime.datetime.now().time().strftime("%H:%M:%S")
     lastRun = f"{currentDate} {currentTime}"
+
+    if n_clicks > 0:
+        years_chosen = years_chosen[0], years_chosen[1] + 1
 
     if years_chosen[0] != years_chosen[1]:
         dff = dff[dff.year.between(years_chosen[0], years_chosen[1])]
@@ -170,10 +176,13 @@ def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
             geo={"projection": {"type": "natural earth"}},
             margin=dict(l=50, r=50, t=50, b=50),
         )
-        return fig, lastRun, f"Clicked {n_clicks} times"
+        return fig, f"Data Last Fetched: {lastRun}", f"Clicked {n_clicks} times", years_chosen
 
     if years_chosen[0] == years_chosen[1]:
-        dff = dff[dff["year"].isin(years_chosen)]
+        dff = dff[dff.year.between(years_chosen[0], years_chosen[1])]
+        dff = dff.groupby(["iso3c", "country"])[indct_chosen].mean()
+        dff = dff.reset_index()
+
         fig = px.choropleth(
             data_frame=dff,
             locations="iso3c",
@@ -189,7 +198,7 @@ def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
             geo={"projection": {"type": "natural earth"}},
             margin=dict(l=50, r=50, t=50, b=50),
         )
-        return fig, lastRun, n_clicks
+        return fig, f"Data Last Fetched: {lastRun}", f"Clicked {n_clicks} times", years_chosen
 
 
 if __name__ == "__main__":
