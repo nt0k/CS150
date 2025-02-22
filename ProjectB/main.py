@@ -8,10 +8,9 @@ import datetime
 app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
 
 indicators = {
-    "EN.GHG.ALL.PC.CE.AR5": "Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita)",
-    "AG.LND.FRST.ZS": "Forest area (% of land area)",
-    "EG.ELC.ACCS.ZS": "Access to electricity (% of population)",
-    "SP.DYN.LE00.IN" : "Life expectancy at birth, total (years)"
+    "IT.NET.USER.ZS": "Individuals using the Internet (% of population)",
+    "SG.GEN.PARL.ZS": "Proportion of seats held by women in national parliaments (%)",
+    "SP.URB.TOTL.IN.ZS": "Urban population (% of total population)",
 }
 
 # get country name and ISO id for mapping on choropleth
@@ -27,7 +26,7 @@ countries = countries.rename(columns={"name": "country"})
 def update_wb_data():
     # Retrieve specific world bank data from API
     df = wb.download(
-        indicator=(list(indicators)), country=countries["iso3c"], start=2000, end=2020
+        indicator=(list(indicators)), country=countries["iso3c"], start=2005, end=2016
     )
     df = df.reset_index()
     df.year = df.year.astype(int)
@@ -80,17 +79,12 @@ app.layout = dbc.Container(
                     ),
                     dcc.RangeSlider(
                         id="years-range",
-                        min=2000,
-                        max=2020,
+                        min=2005,
+                        max=2016,
                         step=1,
-                        value=[2000, 2001],
+                        value=[2005, 2006],
                         marks={
-                            2000: "2000",
-                            2001: "'01",
-                            2002: "'02",
-                            2003: "'03",
-                            2004: "'04",
-                            2005: "'05",
+                            2005: "2005",
                             2006: "'06",
                             2007: "'07",
                             2008: "'08",
@@ -101,11 +95,7 @@ app.layout = dbc.Container(
                             2013: "'13",
                             2014: "'14",
                             2015: "'15",
-                            2016: "'16",
-                            2017: "'17",
-                            2018: "'18",
-                            2019: "'19",
-                            2020: "'20",
+                            2016: "2016",
                         },
                     ),
                 ],
@@ -175,13 +165,11 @@ def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
             data_frame=dff,
             locations="iso3c",
             color=indct_chosen,
-            scope="asia",
+            scope="world",
             hover_data={"iso3c": False, "country": True},
             labels={
-                indicators["EN.GHG.ALL.PC.CE.AR5"]: "Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita)",
-                indicators["AG.LND.FRST.ZS"]: "Forest area (% of land area)",
-                indicators["EG.ELC.ACCS.ZS"]: "Access to electricity (% of population)",
-                indicators["SP.DYN.LE00.IN"] : "Life expectancy at birth, total (years)"
+                indicators["SG.GEN.PARL.ZS"]: "% parliament women",
+                indicators["IT.NET.USER.ZS"]: "pop % using internet",
             },
         )
         fig.update_layout(
@@ -199,13 +187,11 @@ def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
             data_frame=dff,
             locations="iso3c",
             color=indct_chosen,
-            scope="asia",
+            scope="world",
             hover_data={"iso3c": False, "country": True},
             labels={
-                indicators["EN.GHG.ALL.PC.CE.AR5"]: "Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita)",
-                indicators["AG.LND.FRST.ZS"]: "Forest area (% of land area)",
-                indicators["EG.ELC.ACCS.ZS"]: "Access to electricity (% of population)",
-                indicators["SP.DYN.LE00.IN"]: "Life expectancy at birth, total (years)"
+                indicators["SG.GEN.PARL.ZS"]: "% parliament women",
+                indicators["IT.NET.USER.ZS"]: "pop % using internet",
             },
         )
         fig.update_layout(
