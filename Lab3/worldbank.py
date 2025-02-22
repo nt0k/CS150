@@ -8,7 +8,7 @@ import datetime
 app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
 
 indicators = {
-    "EN.GHG.ALL.PC.CE.AR5": "Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita)",
+    "EN.GHG.ALL.PC.CE.AR5": "Total greenhouse gas emissions excluding LULUCF per capita",
     "AG.LND.FRST.ZS": "Forest area (% of land area)",
     "EG.ELC.ACCS.ZS": "Access to electricity (% of population)",
     "SP.DYN.LE00.IN" : "Life expectancy at birth, total (years)"
@@ -20,6 +20,8 @@ countries["capitalCity"].replace({"": None}, inplace=True)
 countries.dropna(subset=["capitalCity"], inplace=True)
 countries = countries[["name", "iso3c"]]
 countries = countries[countries["name"] != "Kosovo"]
+countries = countries[countries["name"] != "Qatar"]
+countries = countries[countries["name"] != "Kuwait"]
 countries = countries[countries["name"] != "Korea, Dem. People's Rep."]
 countries = countries.rename(columns={"name": "country"})
 
@@ -178,11 +180,12 @@ def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
             scope="asia",
             hover_data={"iso3c": False, "country": True},
             labels={
-                indicators["EN.GHG.ALL.PC.CE.AR5"]: "Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita)",
+                indicators["EN.GHG.ALL.PC.CE.AR5"]: "Total greenhouse gas emissions per capita",
                 indicators["AG.LND.FRST.ZS"]: "Forest area (% of land area)",
                 indicators["EG.ELC.ACCS.ZS"]: "Access to electricity (% of population)",
                 indicators["SP.DYN.LE00.IN"] : "Life expectancy at birth, total (years)"
             },
+            range_color=[0, dff[indct_chosen].quantile(0.95)]
         )
         fig.update_layout(
             geo={"projection": {"type": "natural earth"}},
@@ -202,11 +205,12 @@ def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
             scope="asia",
             hover_data={"iso3c": False, "country": True},
             labels={
-                indicators["EN.GHG.ALL.PC.CE.AR5"]: "Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita)",
+                indicators["EN.GHG.ALL.PC.CE.AR5"]: "Total greenhouse gas emissions per capita",
                 indicators["AG.LND.FRST.ZS"]: "Forest area (% of land area)",
                 indicators["EG.ELC.ACCS.ZS"]: "Access to electricity (% of population)",
                 indicators["SP.DYN.LE00.IN"]: "Life expectancy at birth, total (years)"
             },
+            range_color=[0, dff[indct_chosen].quantile(0.95)]
         )
         fig.update_layout(
             geo={"projection": {"type": "natural earth"}},
