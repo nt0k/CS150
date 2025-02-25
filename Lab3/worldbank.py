@@ -8,10 +8,10 @@ import datetime
 app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
 
 indicators = {
-    "EN.GHG.ALL.PC.CE.AR5": "Total greenhouse gas emissions excluding LULUCF per capita",
+    "EN.GHG.ALL.PC.CE.AR5": "Total greenhouse gas emissions per capita",
     "AG.LND.FRST.ZS": "Forest area (% of land area)",
     "EG.ELC.ACCS.ZS": "Access to electricity (% of population)",
-    "SP.DYN.LE00.IN" : "Life expectancy at birth, total (years)"
+    "SP.DYN.LE00.IN": "Life expectancy at birth, total (years)"
 }
 
 # get country name and ISO id for mapping on choropleth
@@ -46,13 +46,24 @@ app.layout = dbc.Container(
             dbc.Col(
                 [
                     html.H1(
-                        "Comparison of World Bank Country Data",
+                        "Asian Development and Emissions",
                         style={"textAlign": "center"},
                     ),
-                    html.H3(id="last-run", children="",
-                            style={"textAlign": "center"},
-                            ),
                     dcc.Graph(id="my-choropleth", figure={}),
+                    html.Div(id='hover-container', style={'display': 'none'}, children=[
+                        dcc.Graph(
+                            id='hover-graph',
+                            config={'displayModeBar': False}
+                        ),
+                        dbc.Button(
+                            'Close',
+                            id='close-button',
+                            n_clicks=0,
+                            color='danger',
+                            size='sm',
+                            style={'marginLeft': '10px'}
+                        ),
+                    ])
                 ],
                 width=12,
             )
@@ -61,9 +72,9 @@ app.layout = dbc.Container(
             dbc.Col(
                 [
                     dbc.Label(
-                        "Select Data Set:",
-                        className="fw-bold",
-                        style={"textDecoration": "underline", "fontSize": 20},
+                        "Select Data Set",
+                        className="fw-bold text-center w-100",
+                        style={"fontSize": 20},
                     ),
                     dcc.Dropdown(
                         id="dropdown-replacement",
@@ -76,16 +87,16 @@ app.layout = dbc.Container(
             dbc.Col(
                 [
                     dbc.Label(
-                        "Select Years:",
-                        className="fw-bold",
-                        style={"textDecoration": "underline", "fontSize": 20},
+                        "Select Years",
+                        className="fw-bold text-center w-100",
+                        style={"fontSize": 20},
                     ),
-                    dcc.RangeSlider(
+                    dcc.Slider(
                         id="years-range",
                         min=2000,
                         max=2020,
                         step=1,
-                        value=[2000, 2001],
+                        value=2000,
                         marks={
                             2000: "2000",
                             2001: "'01",
@@ -115,19 +126,15 @@ app.layout = dbc.Container(
             dbc.Row(
                 [
                     dbc.Col(
-                        html.Span(id="click-count", children="Clicked 0 times"),
-                        width="auto",
-                        className="mt-4 align-items-center"
-                    ),
-                    dbc.Col(
                         dbc.Button(
                             id="my-button",
-                            children="Submit",
+                            children="Advance Slider",
                             n_clicks=0,
                             color="primary",
-                            className="mt-4 fw-bold"
+                            className="mt-4 fw-bold mx-auto"
                         ),
-                        width="auto"
+                        width=6,
+                        className="d-flex justify-content-end"
                     ),
                 ],
                 justify="end"
@@ -150,8 +157,6 @@ def store_data(n_time):
 
 @app.callback(
     Output("my-choropleth", "figure"),
-    Output("last-run", "children"),
-    Output("click-count", "children"),
     Output("years-range", "value"),
     Input("my-button", "n_clicks"),
     Input("storage", "data"),
@@ -161,62 +166,82 @@ def store_data(n_time):
 def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
     dff = pd.DataFrame.from_records(stored_dataframe)
 
-    currentDate = datetime.datetime.now().date().strftime("%m-%d-%Y")
-    currentTime = datetime.datetime.now().time().strftime("%H:%M:%S")
-    lastRun = f"{currentDate} {currentTime}"
-
     if n_clicks > 0:
-        years_chosen = years_chosen[0], years_chosen[1] + 1
+        years_chosen = years_chosen + 1
+    if n_clicks % 20 == 0:
+        years_chosen = 2000
 
-    if years_chosen[0] != years_chosen[1]:
-        dff = dff[dff.year.between(years_chosen[0], years_chosen[1])]
-        dff = dff.groupby(["iso3c", "country"])[indct_chosen].mean()
-        dff = dff.reset_index()
+    dff = dff[dff.year == years_chosen]
+    dff = dff.groupby(["iso3c", "country"])[indct_chosen].mean()
+    dff = dff.reset_index()
 
-        fig = px.choropleth(
-            data_frame=dff,
-            locations="iso3c",
-            color=indct_chosen,
-            scope="asia",
-            hover_data={"iso3c": False, "country": True},
-            labels={
-                indicators["EN.GHG.ALL.PC.CE.AR5"]: "Total greenhouse gas emissions per capita",
-                indicators["AG.LND.FRST.ZS"]: "Forest area (% of land area)",
-                indicators["EG.ELC.ACCS.ZS"]: "Access to electricity (% of population)",
-                indicators["SP.DYN.LE00.IN"] : "Life expectancy at birth, total (years)"
-            },
-            range_color=[0, dff[indct_chosen].quantile(0.95)]
-        )
-        fig.update_layout(
-            geo={"projection": {"type": "natural earth"}},
-            margin=dict(l=50, r=50, t=50, b=50),
-        )
-        return fig, f"Data Last Fetched: {lastRun}", f"Clicked {n_clicks} times", years_chosen
+    fig = px.choropleth(
+        data_frame=dff,
+        locations="iso3c",
+        color=indct_chosen,
+        scope="asia",
+        hover_data={"iso3c": False, "country": True},
+        labels={
+            indicators["EN.GHG.ALL.PC.CE.AR5"]: "Total greenhouse gas emissions per capita",
+            indicators["AG.LND.FRST.ZS"]: "Forest area (% of land area)",
+            indicators["EG.ELC.ACCS.ZS"]: "Access to electricity (% of population)",
+            indicators["SP.DYN.LE00.IN"]: "Life expectancy at birth, total (years)"
+        },
+        range_color=[0, dff[indct_chosen].quantile(0.95)]
+    )
+    fig.update_layout(
+        geo={"projection": {"type": "natural earth"}},
+        margin=dict(l=50, r=50, t=50, b=50),
+    )
+    return fig, years_chosen
 
-    if years_chosen[0] == years_chosen[1]:
-        dff = dff[dff.year.between(years_chosen[0], years_chosen[1])]
-        dff = dff.groupby(["iso3c", "country"])[indct_chosen].mean()
-        dff = dff.reset_index()
 
-        fig = px.choropleth(
-            data_frame=dff,
-            locations="iso3c",
-            color=indct_chosen,
-            scope="asia",
-            hover_data={"iso3c": False, "country": True},
-            labels={
-                indicators["EN.GHG.ALL.PC.CE.AR5"]: "Total greenhouse gas emissions per capita",
-                indicators["AG.LND.FRST.ZS"]: "Forest area (% of land area)",
-                indicators["EG.ELC.ACCS.ZS"]: "Access to electricity (% of population)",
-                indicators["SP.DYN.LE00.IN"]: "Life expectancy at birth, total (years)"
-            },
-            range_color=[0, dff[indct_chosen].quantile(0.95)]
-        )
-        fig.update_layout(
-            geo={"projection": {"type": "natural earth"}},
-            margin=dict(l=50, r=50, t=50, b=50),
-        )
-        return fig, f"Data Last Fetched: {lastRun}", f"Clicked {n_clicks} times", years_chosen
+@app.callback(
+    Output('hover-graph', 'figure'),
+    Output('hover-container', 'style'),
+    Input("my-choropleth", "clickData"),
+    Input("storage", "data"),
+)
+def update_output(clickData, stored_dataframe):
+    default_style = {'display': 'none'}
+    default_fig = px.line()
+
+    if not clickData:
+        return default_fig, default_style
+
+    location = clickData['points'][0]['location']
+
+    dff = pd.DataFrame.from_records(stored_dataframe)
+    dff = dff[dff.iso3c == location]
+
+    fig = px.line(
+        data_frame=dff,
+        x="year",
+        y='Life expectancy at birth, total (years)',
+        color="country",
+    )
+
+    style = {
+        'display': 'block',  # Show the graph
+        'position': 'absolute',  # Position it over the choropleth
+        'top': '100px',  # Arbitrary position; adjust as needed
+        'left': '75px',  # Arbitrary position; adjust as needed
+        'zIndex': 1000  # Ensure it overlays the choropleth
+    }
+
+    return fig, style
+
+
+@app.callback(
+    Output('hover-graph', 'figure', allow_duplicate=True),
+    Output('hover-container', 'style', allow_duplicate=True),
+    Input('close-button', 'n_clicks'),
+    prevent_initial_call=True
+)
+def closeGraph(n_clicks):
+    default_style = {'display': 'none'}
+    default_fig = px.line()
+    return default_fig, default_style
 
 
 if __name__ == "__main__":
