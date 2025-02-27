@@ -3,6 +3,7 @@ import plotly.express as px
 import dash_bootstrap_components as dbc
 import pandas as pd
 from pandas_datareader import wb
+from dash import callback_context
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
 
@@ -127,13 +128,28 @@ app.layout = dbc.Container(
             dbc.Row(
                 [
                     dbc.Col(
-                        dbc.Button(
-                            id="my-button",
-                            children="Advance Slider",
-                            n_clicks=0,
-                            color="primary",
-                            className="mt-4 fw-bold mx-auto"
-                        ),
+                        [
+                            dbc.Button(
+                                id="my-button",
+                                children="Advance Slider",
+                                n_clicks=0,
+                                color="primary",
+                                className="mt-4 fw-bold mx-auto"
+                            ),
+                            dbc.Button(
+                                id="dynamic-button",
+                                children="Toggle Animation",
+                                n_clicks=0,
+                                color="primary",
+                                className="mt-4 fw-bold mx-auto"
+                            ),
+                            dcc.Interval(
+                                id="interval-component",
+                                interval=500,
+                                n_intervals=0,
+                                disabled=True
+                            ),
+                        ],
                         width=6,
                         className="d-flex justify-content-end"
                     ),
@@ -159,17 +175,23 @@ def store_data(n_time):
 @app.callback(
     Output("my-choropleth", "figure"),
     Output("years-range", "value"),
+    Input("interval-component", "n_intervals"),
     Input("my-button", "n_clicks"),
     Input("storage", "data"),
-    State("years-range", "value"),
-    State("dropdown-replacement", "value"),
+    Input("years-range", "value"),
+    Input("dropdown-replacement", "value"),
 )
-def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
+def update_graph(n_intervals, n_clicks, stored_dataframe, years_chosen, indct_chosen):
     dff = pd.DataFrame.from_records(stored_dataframe)
 
-    if n_clicks > 0:
-        years_chosen = years_chosen + 1
-    if n_clicks % 20 == 0:
+    triggered_id = callback_context.triggered_id
+
+    # Only increment if triggered by the button or interval
+    if triggered_id in ["my-button", "interval-component"]:
+        years_chosen += 1
+
+    # Reset condition
+    if years_chosen >= 2021:
         years_chosen = 2000
 
     dff = dff[dff.year == years_chosen]
@@ -220,8 +242,8 @@ def update_output(clickData, stored_dataframe):
         x="year",
         y='Life expectancy at birth, total (years)',
         labels={
-        "Life expectancy at birth, total (years)": "Life expectancy at birth",
-        "year": ""
+            "Life expectancy at birth, total (years)": "Life expectancy at birth",
+            "year": ""
         },
     )
 
@@ -255,6 +277,15 @@ def closeGraph(n_clicks):
     default_style = {'display': 'none'}
     default_fig = px.line()
     return default_fig, default_style
+
+
+@app.callback(
+    Output("interval-component", "disabled"),
+    Input("dynamic-button", "n_clicks"),
+    prevent_initial_call=True
+)
+def toggle_interval(n_clicks):
+    return n_clicks % 2 == 0
 
 
 if __name__ == "__main__":
