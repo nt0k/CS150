@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc, Input, Output, State
+from dash import Dash, html, dcc, Input, Output, State, no_update
 import plotly.express as px
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -80,7 +80,8 @@ app.layout = dbc.Container(
                     ),
                     dcc.Dropdown(
                         id="dropdown-replacement",
-                        options=[{"label": i, "value": i} for i in indicators.values() if i != "Life expectancy at birth, total (years)"],
+                        options=[{"label": i, "value": i} for i in indicators.values() if
+                                 i != "Life expectancy at birth, total (years)"],
                         value="Access to electricity (% of population)",
                     ),
                 ],
@@ -222,18 +223,20 @@ def update_graph(n_intervals, n_clicks, stored_dataframe, years_chosen, indct_ch
 @app.callback(
     Output('hover-graph', 'figure'),
     Output('hover-container', 'style'),
+    Output("my-choropleth", "clickData"),
     Input("my-choropleth", "clickData"),
     Input("storage", "data"),
 )
-def update_output(clickData, stored_dataframe):
+def update_hover_graph(clickData, stored_dataframe):
     default_style = {'display': 'none'}
     default_fig = px.line()
 
     if not clickData:
-        return default_fig, default_style
+        return default_fig, default_style, no_update
 
     location = clickData['points'][0]['location']
 
+    print(f"Clicked on {location} and click data {clickData}")
     dff = pd.DataFrame.from_records(stored_dataframe)
     dff = dff[dff.iso3c == location]
 
@@ -266,7 +269,7 @@ def update_output(clickData, stored_dataframe):
         'borderRadius': '10px'  # Adds rounded corners
     }
 
-    return fig, container_style
+    return fig, container_style, None
 
 
 @app.callback(
