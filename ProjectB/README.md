@@ -10,7 +10,7 @@
 **Thesis**: Asia has developed significantly in the last two decades increasing electricity
 availability and life expectancy while only moderately increasing its per capita emissions.
 
-**Context**: Who, what, how. My audience is my classmates and teacher. They have some familiarity
+**Context**: My audience is my classmates and teacher. They have some familiarity
 with world bank data as they have done research in preparation for this project. I will convey 
 an optimistic message about Asia's development and environmental impacts. The takeaway that I want
 my audience to have is that Asia is improving like the rest of the world, and more humans are flourishing. Several countries
@@ -23,4 +23,5 @@ Forest area (% of land area), Access to electricity (% of population), and Life 
 **Visualization Strategies**: I will use a choropleth graph to visualize changes in the region of Asia with several
 options for interactivity. The years can be changed manually, advanced one at a time with a button, or a continuous animation
 can be toggled with another button. For a closer look, each country will be able to be clicked on to display how its
-life expectancy has changed over the last two decades. 
+life expectancy has changed over the last two decades. I have removed clutter to reduce cognitive load, and leveraged a
+consistent  color scheme for all choropleth graph options. I also made sure that all my y-axis started at zero.

@@ -48,8 +48,8 @@ app.layout = dbc.Container(
         dbc.Row(
             dbc.Col(
                 [
-                    html.H1(
-                        "Asian Development and Emissions",
+                    html.H3(
+                        "Asian Development and its impact on Life Expectancy, Emissions, and Forest Area",
                         style={"textAlign": "center"},
                     ),
                     dcc.Graph(id="my-choropleth", figure={}),
@@ -74,7 +74,7 @@ app.layout = dbc.Container(
             dbc.Col(
                 [
                     dbc.Label(
-                        "Select Data Set",
+                        "Select Data",
                         className="fw-bold text-center w-100",
                         style={"fontSize": 20},
                     ),
@@ -110,7 +110,7 @@ app.layout = dbc.Container(
                             2007: "'07",
                             2008: "'08",
                             2009: "'09",
-                            2010: "'10",
+                            2010: "2010",
                             2011: "'11",
                             2012: "'12",
                             2013: "'13",
@@ -120,7 +120,7 @@ app.layout = dbc.Container(
                             2017: "'17",
                             2018: "'18",
                             2019: "'19",
-                            2020: "'20",
+                            2020: "2020",
                         },
                     ),
                 ],
