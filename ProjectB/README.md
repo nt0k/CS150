@@ -18,7 +18,9 @@ have increased their electricity availability and life expectancy, while forest 
 emissions have increased slightly.
 
 **Data**: I pulled the following data from the world bank: Total greenhouse gas emissions excluding LULUCF per capita,
-Forest area (% of land area), Access to electricity (% of population), and Life expectancy at birth, total (years).
+Forest area (% of land area), Access to electricity (% of population), and Life expectancy at birth, total (years). I
+selected this data because the world bank has some of the most detailed and reliable data for the topic that I selected
+for this project.
 
 **Visualization Strategies**: I will use a choropleth graph to visualize changes in the region of Asia with several
 options for interactivity. The years can be changed manually, advanced one at a time with a button, or a continuous animation

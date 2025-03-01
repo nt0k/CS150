@@ -205,7 +205,6 @@ def update_graph(n_intervals, n_clicks, stored_dataframe, years_chosen, indct_ch
     if triggered_id in ["my-button", "interval-component"]:
         years_chosen += 1
 
-    # Reset condition
     if years_chosen >= 2023:
         years_chosen = 2000
 
