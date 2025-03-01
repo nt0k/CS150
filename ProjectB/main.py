@@ -32,7 +32,7 @@ countries = countries.rename(columns={"name": "country"})
 def update_wb_data():
     # Retrieve specific world bank data from API
     df = wb.download(
-        indicator=(list(indicators)), country=countries["iso3c"], start=2000, end=2020
+        indicator=(list(indicators)), country=countries["iso3c"], start=2000, end=2022
     )
     df = df.reset_index()
     df.year = df.year.astype(int)
@@ -50,6 +50,10 @@ app.layout = dbc.Container(
                 [
                     html.H3(
                         "Asian Development and its impact on Life Expectancy, Emissions, and Forest Area",
+                        style={"textAlign": "center"},
+                    ),
+                    html.H5(
+                        "A Socially Responsible Computing Project by Nathan Kirk",
                         style={"textAlign": "center"},
                     ),
                     dcc.Graph(id="my-choropleth", figure={}),
@@ -97,7 +101,7 @@ app.layout = dbc.Container(
                     dcc.Slider(
                         id="years-range",
                         min=2000,
-                        max=2020,
+                        max=2022,
                         step=1,
                         value=2000,
                         marks={
@@ -111,7 +115,7 @@ app.layout = dbc.Container(
                             2007: "'07",
                             2008: "'08",
                             2009: "'09",
-                            2010: "2010",
+                            2010: "'10",
                             2011: "'11",
                             2012: "'12",
                             2013: "'13",
@@ -121,13 +125,23 @@ app.layout = dbc.Container(
                             2017: "'17",
                             2018: "'18",
                             2019: "'19",
-                            2020: "2020",
+                            2020: "'20",
+                            2021: "'21 ",
+                            2022: "2022",
                         },
                     ),
                 ],
             ),
             dbc.Row(
                 [
+                    dbc.Col(
+                        html.H5(
+                            "How do emissions and forest area change as electricity access and life expectancy "
+                            "increase?",
+                            style={"textAlign": "center", "fontSize": 13, "padding": 20},
+                        ),
+                        width=6,
+                    ),
                     dbc.Col(
                         [
                             dbc.Button(
@@ -192,11 +206,11 @@ def update_graph(n_intervals, n_clicks, stored_dataframe, years_chosen, indct_ch
         years_chosen += 1
 
     # Reset condition
-    if years_chosen >= 2021:
+    if years_chosen >= 2023:
         years_chosen = 2000
 
     dff = dff[dff.year == years_chosen]
-    dff = dff.groupby(["iso3c", "country"])[indct_chosen].mean()
+    dff = dff.groupby(["iso3c", "country"])[indct_chosen].mean().round(1)
     dff = dff.reset_index()
 
     fig = px.choropleth(
