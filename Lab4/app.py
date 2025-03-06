@@ -3,10 +3,11 @@ from dash import Dash, dcc, html, dash_table, Input, Output, State, callback_con
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import pandas as pd
+import plotly.express as px
 
 app = Dash(
     __name__,
-    external_stylesheets=[dbc.themes.SPACELAB, dbc.icons.FONT_AWESOME],
+    external_stylesheets=[dbc.themes.MINTY, dbc.icons.FONT_AWESOME],
 )
 
 #  make dataframe from  spreadsheet:
@@ -109,10 +110,10 @@ Tables
 total_returns_table = dash_table.DataTable(
     id="total_returns",
     columns=[{"id": "Year", "name": "Year", "type": "text"}]
-    + [
-        {"id": col, "name": col, "type": "numeric", "format": {"specifier": "$,.0f"}}
-        for col in ["Cash", "Bonds", "Stocks", "Total"]
-    ],
+            + [
+                {"id": col, "name": col, "type": "numeric", "format": {"specifier": "$,.0f"}}
+                for col in ["Cash", "Bonds", "Stocks", "Total"]
+            ],
     page_size=15,
     style_table={"overflowX": "scroll"},
 )
@@ -120,11 +121,11 @@ total_returns_table = dash_table.DataTable(
 annual_returns_pct_table = dash_table.DataTable(
     id="annual_returns_pct",
     columns=(
-        [{"id": "Year", "name": "Year", "type": "text"}]
-        + [
-            {"id": col, "name": col, "type": "numeric", "format": {"specifier": ".1%"}}
-            for col in df.columns[1:]
-        ]
+            [{"id": "Year", "name": "Year", "type": "text"}]
+            + [
+                {"id": col, "name": col, "type": "numeric", "format": {"specifier": ".1%"}}
+                for col in df.columns[1:]
+            ]
     ),
     data=df.to_dict("records"),
     sort_action="native",
@@ -179,19 +180,17 @@ Figures
 """
 
 
-def make_pie(slider_input, title):
-    fig = go.Figure(
-        data=[
-            go.Pie(
-                labels=["Cash", "Bonds", "Stocks"],
-                values=slider_input,
-                textinfo="label+percent",
-                textposition="inside",
-                marker={"colors": [COLORS["cash"], COLORS["bonds"], COLORS["stocks"]]},
-                sort=False,
-                hoverinfo="none",
-            )
-        ]
+def make_tree_map(slider_input, title):
+    fig = px.treemap(
+        names=["Cash", "Bonds", "Stocks"],
+        values=slider_input,
+        parents=["", "", ""],
+        color=["Cash", "Bonds", "Stocks"],
+        color_discrete_map={
+            "Cash": COLORS["cash"],
+            "Bonds": COLORS["bonds"],
+            "Stocks": COLORS["stocks"]
+        }
     )
     fig.update_layout(
         title_text=title,
@@ -304,7 +303,6 @@ slider_card = dbc.Card(
     className="mt-4",
 )
 
-
 time_period_data = [
     {
         "label": f"2007-2008: Great Financial Crisis to {MAX_YR}",
@@ -332,7 +330,6 @@ time_period_data = [
         "planning_time": MAX_YR - MIN_YR + 1,
     },
 ]
-
 
 time_period_card = dbc.Card(
     [
@@ -421,7 +418,6 @@ input_groups = html.Div(
     className="mt-4 p-4",
 )
 
-
 # =====  Results Tab components
 
 results_card = dbc.Card(
@@ -432,7 +428,6 @@ results_card = dbc.Card(
     className="mt-4",
 )
 
-
 data_source_card = dbc.Card(
     [
         dbc.CardHeader("Source Data: Annual Total Returns"),
@@ -440,7 +435,6 @@ data_source_card = dbc.Card(
     ],
     className="mt-4",
 )
-
 
 # ========= Learn Tab  Components
 learn_card = dbc.Card(
@@ -450,7 +444,6 @@ learn_card = dbc.Card(
     ],
     className="mt-4",
 )
-
 
 # ========= Build tabs
 tabs = dbc.Tabs(
@@ -468,7 +461,6 @@ tabs = dbc.Tabs(
     active_tab="tab-2",
     className="mt-2",
 )
-
 
 """
 ==========================================================================
@@ -512,13 +504,13 @@ def backtest(stocks, cash, start_bal, nper, start_yr):
 
             # calculate this period's  returns
             dff.loc[yr, "Cash"] = dff.loc[yr, "Cash"] * (
-                1 + dff.loc[yr, "3-mon T.Bill"]
+                    1 + dff.loc[yr, "3-mon T.Bill"]
             )
             dff.loc[yr, "Stocks"] = dff.loc[yr, "Stocks"] * (1 + dff.loc[yr, "S&P 500"])
             dff.loc[yr, "Bonds"] = dff.loc[yr, "Bonds"] * (
-                1 + dff.loc[yr, "10yr T.Bond"]
+                    1 + dff.loc[yr, "10yr T.Bond"]
             )
-            dff.loc[yr, "Total"] = dff.loc[yr, ["Cash", "Bonds", "Stocks"]].sum()
+            dff.loc[yr, "Total"] = dff.loc[yr, ["Cash", "Bonds", "Stocks"]].sum().astype(int)
 
     dff = dff.reset_index(drop=True)
     columns = ["Cash", "Stocks", "Bonds", "Total"]
@@ -571,10 +563,16 @@ app.layout = dbc.Container(
     [
         dbc.Row(
             dbc.Col(
-                html.H2(
-                    "Asset Allocation Visualizer",
-                    className="text-center bg-primary text-white p-2",
-                ),
+                [
+                    html.H2(
+                        "Asset Allocation Visualizer",
+                        className="text-center bg-primary text-white p-2",
+                    ),
+                    html.H5(
+                        "Nathan Kirk, CS150 taught by Mike Ryu",
+                        style={"textAlign": "center"},
+                    ),
+                ]
             )
         ),
         dbc.Row(
@@ -600,7 +598,6 @@ app.layout = dbc.Container(
     fluid=True,
 )
 
-
 """
 ==========================================================================
 Callbacks
@@ -622,7 +619,7 @@ def update_pie(stocks, cash):
         investment_style = "Conservative"
     else:
         investment_style = "Moderate"
-    figure = make_pie(slider_input, investment_style + " Asset Allocation")
+    figure = make_tree_map(slider_input, investment_style + " Asset Allocation")
     return figure
 
 
