@@ -318,7 +318,12 @@ slider_card = dbc.Card(
                 html.H4(id="bond_amount", children="", style={'display': 'inline-block'})
             ],
             className="card-title mt-3"
-        )
+        ),
+        html.H4(
+            "Use Previous Setting",
+            className="card-title mt-3",
+        ),
+        dbc.Button("Click Me", id="history_button", color="primary", className="me-2", n_clicks=0, disabled=True),
     ],
     body=True,
     className="mt-4",
@@ -753,6 +758,41 @@ def update_totals(stocks, cash, start_bal, planning_time, start_yr, existing_dat
 
     return data, fig, summary_table, ending_amount, ending_cagr, existing_data + [new_row] if existing_data else [
         new_row]
+
+
+@app.callback(
+    Output("stock_bond", "value", allow_duplicate=True),
+    Output("cash", "value", allow_duplicate=True),
+    Output("starting_amount", "value", allow_duplicate=True),
+    Output("planning_time", "value", allow_duplicate=True),
+    Output("start_yr", "value", allow_duplicate=True),
+    Output("past_settings", "data", allow_duplicate=True),
+    Input("history_button", "n_clicks"),
+    State("past_settings", "data"),
+    prevent_initial_call=True
+)
+def load_last_settings(clicks, past_settings):
+    last_record = past_settings[-1]
+    updated_settings = past_settings[:-1]
+
+    stocks = last_record.get("stock_allocation", 0)
+    cash = last_record.get("cash_allocation", 0)
+    start_bal = last_record.get("start_amount", 10)
+    planning_time = last_record.get("number_of_years", 1)
+    start_yr = last_record.get("start_year", MIN_YR)
+    return stocks, cash, start_bal, planning_time, start_yr, updated_settings
+
+
+@app.callback(Output("history_button", "disabled", allow_duplicate=True),
+              Input("past_settings", "data"),
+              prevent_initial_call=True
+              )
+def button_check(past_settings):
+    print(f"button check is running with settings: {past_settings}")
+    if past_settings:
+        return False
+    else:
+        return True
 
 
 if __name__ == "__main__":
