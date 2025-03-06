@@ -117,6 +117,21 @@ total_returns_table = dash_table.DataTable(
     page_size=15,
     style_table={"overflowX": "scroll"},
 )
+store = dcc.Store(id="past_settings_store", data=[])
+past_settings_table = dash_table.DataTable(
+    id="past_settings",
+    columns=[
+        {"name": "Cash Allocation", "id": "cash_allocation"},
+        {"name": "Stock Allocation", "id": "stock_allocation"},
+        {"name": "Bond Allocation", "id": "bond_allocation"},
+        {"name": "Start Amount", "id": "start_amount"},
+        {"name": "Start Year", "id": "start_year"},
+        {"name": "Number of Years", "id": "number_of_years"},
+    ],
+    page_size=15,
+    style_table={"overflowX": "scroll"},
+    data=[],  # Dynamically updated
+)
 
 annual_returns_pct_table = dash_table.DataTable(
     id="annual_returns_pct",
@@ -288,7 +303,6 @@ slider_card = dbc.Card(
             "Then set stock allocation % ",
             className="card-title mt-3",
         ),
-        html.Div("(The rest will be bonds)", className="card-title"),
         dcc.Slider(
             id="stock_bond",
             marks={i: f"{i}%" for i in range(0, 91, 10)},
@@ -298,6 +312,13 @@ slider_card = dbc.Card(
             value=50,
             included=False,
         ),
+        html.Div(
+            [
+                html.H4("Bond allocation: ", style={'display': 'inline-block', 'margin-right': '5px'}),
+                html.H4(id="bond_amount", children="", style={'display': 'inline-block'})
+            ],
+            className="card-title mt-3"
+        )
     ],
     body=True,
     className="mt-4",
@@ -445,6 +466,15 @@ learn_card = dbc.Card(
     className="mt-4",
 )
 
+# ========= Past Settings Tab  Components
+past_setting_card = dbc.Card(
+    [
+        dbc.CardHeader("Previous Settings"),
+        dbc.CardBody(past_settings_table),
+    ],
+    className="mt-4",
+)
+
 # ========= Build tabs
 tabs = dbc.Tabs(
     [
@@ -456,6 +486,7 @@ tabs = dbc.Tabs(
             className="pb-4",
         ),
         dbc.Tab([results_card, data_source_card], tab_id="tab-3", label="Results"),
+        dbc.Tab(past_setting_card, tab_id="tab-4", label="Previous Settings"),
     ],
     id="tabs",
     active_tab="tab-2",
@@ -580,7 +611,7 @@ app.layout = dbc.Container(
                 dbc.Col(tabs, width=12, lg=5, className="mt-4 border"),
                 dbc.Col(
                     [
-                        dcc.Graph(id="allocation_pie_chart", className="mb-2"),
+                        dcc.Graph(id="allocation_tree_map", className="mb-2"),
                         dcc.Graph(id="returns_chart", className="pb-4"),
                         html.Hr(),
                         html.Div(id="summary_table"),
@@ -605,11 +636,12 @@ Callbacks
 
 
 @app.callback(
-    Output("allocation_pie_chart", "figure"),
+    Output("allocation_tree_map", "figure"),
+    Output("bond_amount", "children"),
     Input("stock_bond", "value"),
     Input("cash", "value"),
 )
-def update_pie(stocks, cash):
+def update_tree_map(stocks, cash):
     bonds = 100 - stocks - cash
     slider_input = [cash, bonds, stocks]
 
@@ -620,7 +652,7 @@ def update_pie(stocks, cash):
     else:
         investment_style = "Moderate"
     figure = make_tree_map(slider_input, investment_style + " Asset Allocation")
-    return figure
+    return figure, (str(bonds) + "%")
 
 
 @app.callback(
@@ -673,17 +705,28 @@ def update_time_period(planning_time, start_yr, period_number):
     Output("summary_table", "children"),
     Output("ending_amount", "value"),
     Output("cagr", "value"),
+    Output("past_settings", "data"),
     Input("stock_bond", "value"),
     Input("cash", "value"),
     Input("starting_amount", "value"),
     Input("planning_time", "value"),
     Input("start_yr", "value"),
+    State("past_settings", "data")
 )
-def update_totals(stocks, cash, start_bal, planning_time, start_yr):
+def update_totals(stocks, cash, start_bal, planning_time, start_yr, existing_data):
     # set defaults for invalid inputs
     start_bal = 10 if start_bal is None else start_bal
     planning_time = 1 if planning_time is None else planning_time
     start_yr = MIN_YR if start_yr is None else int(start_yr)
+
+    new_row = {
+        "cash_allocation": cash,
+        "stock_allocation": stocks,
+        "bond_allocation": 100 - cash - stocks,
+        "start_amount": start_bal,
+        "start_year": start_yr,
+        "number_of_years": planning_time
+    }
 
     # calculate valid planning time start yr
     max_time = MAX_YR + 1 - start_yr
@@ -708,7 +751,8 @@ def update_totals(stocks, cash, start_bal, planning_time, start_yr):
     # calcluate cagr
     ending_cagr = cagr(dff["Total"])
 
-    return data, fig, summary_table, ending_amount, ending_cagr
+    return data, fig, summary_table, ending_amount, ending_cagr, existing_data + [new_row] if existing_data else [
+        new_row]
 
 
 if __name__ == "__main__":
