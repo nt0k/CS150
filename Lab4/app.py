@@ -323,7 +323,8 @@ slider_card = dbc.Card(
             "Use Previous Setting",
             className="card-title mt-3",
         ),
-        dbc.Button("Click Me", id="history_button", color="primary", className="me-2", n_clicks=0, disabled=True),
+        dbc.Button("Use Prior Setting", id="history_button", color="primary", className="me-2", n_clicks=0,
+                   disabled=True),
     ],
     body=True,
     className="mt-4",
@@ -710,13 +711,14 @@ def update_time_period(planning_time, start_yr, period_number):
     Output("summary_table", "children"),
     Output("ending_amount", "value"),
     Output("cagr", "value"),
-    Output("past_settings", "data"),
+    Output("past_settings", "data", allow_duplicate=True),
     Input("stock_bond", "value"),
     Input("cash", "value"),
     Input("starting_amount", "value"),
     Input("planning_time", "value"),
     Input("start_yr", "value"),
-    State("past_settings", "data")
+    State("past_settings", "data"),
+    prevent_initial_call=True,
 )
 def update_totals(stocks, cash, start_bal, planning_time, start_yr, existing_data):
     # set defaults for invalid inputs
@@ -724,6 +726,7 @@ def update_totals(stocks, cash, start_bal, planning_time, start_yr, existing_dat
     planning_time = 1 if planning_time is None else planning_time
     start_yr = MIN_YR if start_yr is None else int(start_yr)
 
+    # if button clicked, don't use this and return updated_settings, if not then append new row
     new_row = {
         "cash_allocation": cash,
         "stock_allocation": stocks,
@@ -769,30 +772,27 @@ def update_totals(stocks, cash, start_bal, planning_time, start_yr, existing_dat
     Output("past_settings", "data", allow_duplicate=True),
     Input("history_button", "n_clicks"),
     State("past_settings", "data"),
-    prevent_initial_call=True
+    prevent_initial_call=True,
 )
-def load_last_settings(clicks, past_settings):
-    last_record = past_settings[-1]
-    updated_settings = past_settings[:-1]
+def push_last_settings(clicks, past_settings):
+    last_record = past_settings[-2]  # Get the second to last record
+    updated_settings = past_settings[:-2]  # Create a new list without the last entry's
+    return (
+        last_record["stock_allocation"],
+        last_record["cash_allocation"],
+        last_record["start_amount"],
+        last_record["number_of_years"],
+        last_record["start_year"],
+        updated_settings,
+    )
 
-    stocks = last_record.get("stock_allocation", 0)
-    cash = last_record.get("cash_allocation", 0)
-    start_bal = last_record.get("start_amount", 10)
-    planning_time = last_record.get("number_of_years", 1)
-    start_yr = last_record.get("start_year", MIN_YR)
-    return stocks, cash, start_bal, planning_time, start_yr, updated_settings
 
-
-@app.callback(Output("history_button", "disabled", allow_duplicate=True),
+@app.callback(Output("history_button", "disabled"),
               Input("past_settings", "data"),
               prevent_initial_call=True
               )
 def button_check(past_settings):
-    print(f"button check is running with settings: {past_settings}")
-    if past_settings:
-        return False
-    else:
-        return True
+    return len(past_settings) <= 1
 
 
 if __name__ == "__main__":
