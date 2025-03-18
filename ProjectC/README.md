@@ -28,3 +28,5 @@ of St. Louis; https://fred.stlouisfed.org/series/MEDLISPRIID, March 18, 2025.
 
 U.S. Department of Labor, State Minimum Wage Rate for Idaho [STTMINWGID], retrieved from FRED, Federal Reserve Bank of
 St. Louis; https://fred.stlouisfed.org/series/STTMINWGID, March 18, 2025.
+
+Natural Gas prices: https://www.eia.gov/dnav/ng/hist/n3010id3a.htm
