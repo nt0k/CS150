@@ -319,10 +319,6 @@ slider_card = dbc.Card(
             ],
             className="card-title mt-3"
         ),
-        html.H4(
-            "Use Previous Setting",
-            className="card-title mt-3",
-        ),
         dbc.Button("Use Prior Setting", id="history_button", color="primary", className="me-2", n_clicks=0,
                    disabled=True),
     ],
