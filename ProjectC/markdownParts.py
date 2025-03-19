@@ -12,44 +12,20 @@ Markdown Text
 
 datasource_text = dcc.Markdown(
     """
-    [Data source:](http://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html)
-    Historical Returns on Stocks, Bonds and Bills from NYU Stern School of
-    Business
+    Data pulled from fred.stlouisfed.org and www.eia.gov.
     """
 )
 
 asset_allocation_text = dcc.Markdown(
     """
-> **Asset allocation** is one of the main factors that drive portfolio risk and returns.   Play with the app and see for yourself!
-
-> Change the allocation to cash, bonds and stocks on the sliders and see how your portfolio performs over time in the graph.
-  Try entering different time periods and dollar amounts too.
+> Play with the app and see for yourself how prices of different basic items have changed over time in Idaho!
 """
 )
 
 learn_text = dcc.Markdown(
     """
-    Past performance certainly does not determine future results, but you can still
-    learn a lot by reviewing how various asset classes have performed over time.
-
-    Use the sliders to change the asset allocation (how much you invest in cash vs
-    bonds vs stock) and see how this affects your returns.
-
-    Note that the results shown in "My Portfolio" assumes rebalancing was done at
-    the beginning of every year.  Also, this information is based on the S&P 500 index
-    as a proxy for "stocks", the 10 year US Treasury Bond for "bonds" and the 3 month
-    US Treasury Bill for "cash."  Your results of course,  would be different based
-    on your actual holdings.
-
-    This is intended to help you determine your investment philosophy and understand
-    what sort of risks and returns you might see for each asset category.
-
-    The  data is from [Aswath Damodaran](http://people.stern.nyu.edu/adamodar/New_Home_Page/home.htm)
-    who teaches  corporate finance and valuation at the Stern School of Business
-    at New York University.
-
-    Check out his excellent on-line course in
-    [Investment Philosophies.](http://people.stern.nyu.edu/adamodar/New_Home_Page/webcastinvphil.htm)
+    Idaho just below average in its costs of living compared to other States. I created a tool to explore different trends
+    over time and see how costs and wages have increased or decreased.
     """
 )
 
@@ -65,9 +41,7 @@ footer = html.Div(
     dcc.Markdown(
         """
          This information is intended solely as general information for educational
-        and entertainment purposes only and is not a substitute for professional advice and
-        services from qualified financial services providers familiar with your financial
-        situation.    
+        and entertainment purposes only. 
         """
     ),
     className="p-2 mt-5 bg-primary text-white small",

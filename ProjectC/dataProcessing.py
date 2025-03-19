@@ -4,6 +4,14 @@ import plotly.graph_objects as go
 import pandas as pd
 import plotly.express as px
 
+df1 = pd.read_csv("assets/Natural Gas Prices.csv")
+df2 = pd.read_csv("assets/Minimum Wage.csv")
+df3 = pd.read_csv("assets/Median Income.csv")
+df4 = pd.read_csv("assets/Median House Price.csv")
+df5 = pd.read_csv("assets/Energy Cost.csv")
+
+print(df5.to_string())
+
 #  make dataframe from  spreadsheet:
 df = pd.read_csv("assets/historic.csv")
 

@@ -15,11 +15,6 @@ the cost of living there better.
 
 **Citations**
 Data source citations (and if using static source, names of source files)
-
-Specific strategies from SwD you will employ to make your visualization effective
-
-At least three (3) example scenarios or stories that could be derived by exploring the data with your dashboard
-
 U.S. Census Bureau, Median Household Income in Idaho [MEHOINUSIDA646N], retrieved from FRED, Federal Reserve Bank of St.
 Louis; https://fred.stlouisfed.org/series/MEHOINUSIDA646N, March 18, 2025.
 
@@ -30,3 +25,9 @@ U.S. Department of Labor, State Minimum Wage Rate for Idaho [STTMINWGID], retrie
 St. Louis; https://fred.stlouisfed.org/series/STTMINWGID, March 18, 2025.
 
 Natural Gas prices: https://www.eia.gov/dnav/ng/hist/n3010id3a.htm
+
+**Strategies**
+Specific strategies from SwD you will employ to make your visualization effective
+
+**Example Scenarios**
+At least three (3) example scenarios or stories that could be derived by exploring the data with your dashboard

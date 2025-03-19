@@ -185,26 +185,6 @@ time_period_data = [
     },
 ]
 
-time_period_card = dbc.Card(
-    [
-        html.H4(
-            "Or select a time period:",
-            className="card-title",
-        ),
-        dbc.RadioItems(
-            id="time_period",
-            options=[
-                {"label": period["label"], "value": i}
-                for i, period in enumerate(time_period_data)
-            ],
-            value=0,
-            labelClassName="mb-2",
-        ),
-    ],
-    body=True,
-    className="mt-4",
-)
-
 # ======= InputGroup components
 
 start_amount = dbc.InputGroup(
@@ -293,7 +273,7 @@ data_source_card = dbc.Card(
 # ========= Learn Tab  Components
 learn_card = dbc.Card(
     [
-        dbc.CardHeader("An Introduction to Asset Allocation"),
+        dbc.CardHeader("An Introduction to this project"),
         dbc.CardBody(learn_text),
     ],
     className="mt-4",
@@ -313,12 +293,11 @@ tabs = dbc.Tabs(
     [
         dbc.Tab(learn_card, tab_id="tab1", label="Learn"),
         dbc.Tab(
-            [asset_allocation_text, slider_card, input_groups, time_period_card],
+            [asset_allocation_text, slider_card, input_groups],
             tab_id="tab-2",
             label="Play",
             className="pb-4",
         ),
-        dbc.Tab([results_card, data_source_card], tab_id="tab-3", label="Results"),
         dbc.Tab(past_setting_card, tab_id="tab-4", label="Previous Settings"),
     ],
     id="tabs",
@@ -337,11 +316,11 @@ app.layout = dbc.Container(
             dbc.Col(
                 [
                     html.H2(
-                        "Asset Allocation Visualizer",
+                        "Cost of Living in Idaho",
                         className="text-center bg-primary text-white p-2",
                     ),
                     html.H5(
-                        "Nathan Kirk, CS150 taught by Mike Ryu",
+                        "Created by Nathan Kirk for CS150 taught by Mike Ryu",
                         style={"textAlign": "center"},
                     ),
                 ]
@@ -355,7 +334,6 @@ app.layout = dbc.Container(
                         dcc.Graph(id="allocation_tree_map", className="mb-2"),
                         dcc.Graph(id="returns_chart", className="pb-4"),
                         html.Hr(),
-                        html.Div(id="summary_table"),
                         html.H6(datasource_text, className="my-2"),
                     ],
                     width=12,
@@ -374,153 +352,6 @@ app.layout = dbc.Container(
 ==========================================================================
 Callbacks
 """
-
-
-@app.callback(
-    Output("allocation_tree_map", "figure"),
-    Output("bond_amount", "children"),
-    Input("stock_bond", "value"),
-    Input("cash", "value"),
-)
-def update_tree_map(stocks, cash):
-    bonds = 100 - stocks - cash
-    slider_input = [cash, bonds, stocks]
-
-    if stocks >= 70:
-        investment_style = "Aggressive"
-    elif stocks <= 30:
-        investment_style = "Conservative"
-    else:
-        investment_style = "Moderate"
-    figure = make_tree_map(slider_input, investment_style + " Asset Allocation")
-    return figure, (str(bonds) + "%")
-
-
-@app.callback(
-    Output("stock_bond", "max"),
-    Output("stock_bond", "marks"),
-    Output("stock_bond", "value"),
-    Input("cash", "value"),
-    State("stock_bond", "value"),
-)
-def update_stock_slider(cash, initial_stock_value):
-    max_slider = 100 - int(cash)
-    stocks = min(max_slider, initial_stock_value)
-
-    # formats the slider scale
-    if max_slider > 50:
-        marks_slider = {i: f"{i}%" for i in range(0, max_slider + 1, 10)}
-    elif max_slider <= 15:
-        marks_slider = {i: f"{i}%" for i in range(0, max_slider + 1, 1)}
-    else:
-        marks_slider = {i: f"{i}%" for i in range(0, max_slider + 1, 5)}
-    return max_slider, marks_slider, stocks
-
-
-@app.callback(
-    Output("planning_time", "value"),
-    Output("start_yr", "value"),
-    Output("time_period", "value"),
-    Input("planning_time", "value"),
-    Input("start_yr", "value"),
-    Input("time_period", "value"),
-)
-def update_time_period(planning_time, start_yr, period_number):
-    """syncs inputs and selected time periods"""
-    ctx = callback_context
-    input_id = ctx.triggered[0]["prop_id"].split(".")[0]
-
-    if input_id == "time_period":
-        planning_time = time_period_data[period_number]["planning_time"]
-        start_yr = time_period_data[period_number]["start_yr"]
-
-    if input_id in ["planning_time", "start_yr"]:
-        period_number = None
-
-    return planning_time, start_yr, period_number
-
-
-@app.callback(
-    Output("total_returns", "data"),
-    Output("returns_chart", "figure"),
-    Output("summary_table", "children"),
-    Output("ending_amount", "value"),
-    Output("cagr", "value"),
-    Output("past_settings", "data", allow_duplicate=True),
-    Input("stock_bond", "value"),
-    Input("cash", "value"),
-    Input("starting_amount", "value"),
-    Input("planning_time", "value"),
-    Input("start_yr", "value"),
-    State("past_settings", "data"),
-    prevent_initial_call=True,
-)
-def update_totals(stocks, cash, start_bal, planning_time, start_yr, existing_data):
-    # set defaults for invalid inputs
-    start_bal = 10 if start_bal is None else start_bal
-    planning_time = 1 if planning_time is None else planning_time
-    start_yr = MIN_YR if start_yr is None else int(start_yr)
-
-    # if button clicked, don't use this and return updated_settings, if not then append new row
-    new_row = {
-        "cash_allocation": cash,
-        "stock_allocation": stocks,
-        "bond_allocation": 100 - cash - stocks,
-        "start_amount": start_bal,
-        "start_year": start_yr,
-        "number_of_years": planning_time
-    }
-
-    # calculate valid planning time start yr
-    max_time = MAX_YR + 1 - start_yr
-    planning_time = min(max_time, planning_time)
-    if start_yr + planning_time > MAX_YR:
-        start_yr = min(df.iloc[-planning_time, 0], MAX_YR)  # 0 is Year column
-
-    # create investment returns dataframe
-    dff = backtest(stocks, cash, start_bal, planning_time, start_yr)
-
-    # create data for DataTable
-    data = dff.to_dict("records")
-
-    # create the line chart
-    fig = make_line_chart(dff)
-
-    summary_table = make_summary_table(dff)
-
-    # format ending balance
-    ending_amount = f"${dff['Total'].iloc[-1]:0,.0f}"
-
-    # calcluate cagr
-    ending_cagr = cagr(dff["Total"])
-
-    return data, fig, summary_table, ending_amount, ending_cagr, existing_data + [new_row] if existing_data else [
-        new_row]
-
-
-@app.callback(
-    Output("stock_bond", "value", allow_duplicate=True),
-    Output("cash", "value", allow_duplicate=True),
-    Output("starting_amount", "value", allow_duplicate=True),
-    Output("planning_time", "value", allow_duplicate=True),
-    Output("start_yr", "value", allow_duplicate=True),
-    Output("past_settings", "data", allow_duplicate=True),
-    Input("history_button", "n_clicks"),
-    State("past_settings", "data"),
-    prevent_initial_call=True,
-)
-def push_last_settings(clicks, past_settings):
-    last_record = past_settings[-2]  # Get the second to last record
-    updated_settings = past_settings[:-2]  # Create a new list without the last entry's
-    return (
-        last_record["stock_allocation"],
-        last_record["cash_allocation"],
-        last_record["start_amount"],
-        last_record["number_of_years"],
-        last_record["start_year"],
-        updated_settings,
-    )
-
 
 @app.callback(Output("history_button", "disabled"),
               Input("past_settings", "data"),
