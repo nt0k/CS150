@@ -26,8 +26,15 @@ St. Louis; https://fred.stlouisfed.org/series/STTMINWGID, March 18, 2025.
 
 Natural Gas prices: https://www.eia.gov/dnav/ng/hist/n3010id3a.htm
 
+Tuition: https://www.collegetuitioncompare.com/trends/boise-state-university/cost-of-attendance/
+
+Ground Beef: https://data.bls.gov/timeseries/APU0400703112?amp%253bdata_tool=XGtable&output_view=data&include_graphs=true
+
 **Strategies**
 Specific strategies from SwD you will employ to make your visualization effective
 
 **Example Scenarios**
 At least three (3) example scenarios or stories that could be derived by exploring the data with your dashboard
+
+
+Groceries, utilities

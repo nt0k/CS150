@@ -57,43 +57,9 @@ def make_line_chart(dff):
     fig.add_trace(
         go.Scatter(
             x=dff["Year"],
-            y=dff["all_cash"],
-            name="All Cash",
+            y=dff[1],
+            name=dff.name,
             marker_color=COLORS["cash"],
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=dff["Year"],
-            y=dff["all_bonds"],
-            name="All Bonds (10yr T.Bonds)",
-            marker_color=COLORS["bonds"],
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=dff["Year"],
-            y=dff["all_stocks"],
-            name="All Stocks (S&P500)",
-            marker_color=COLORS["stocks"],
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=dff["Year"],
-            y=dff["Total"],
-            name="My Portfolio",
-            marker_color="black",
-            line=dict(width=6, dash="dot"),
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=dff["Year"],
-            y=dff["inflation_only"],
-            name="Inflation",
-            visible=True,
-            marker_color=COLORS["inflation"],
         )
     )
     fig.update_layout(
@@ -331,7 +297,7 @@ app.layout = dbc.Container(
                 dbc.Col(tabs, width=12, lg=5, className="mt-4 border"),
                 dbc.Col(
                     [
-                        dcc.Graph(id="allocation_tree_map", className="mb-2"),
+                        dcc.Graph(id="income_graph", className="mb-2"),
                         dcc.Graph(id="returns_chart", className="pb-4"),
                         html.Hr(),
                         html.H6(datasource_text, className="my-2"),
@@ -353,12 +319,20 @@ app.layout = dbc.Container(
 Callbacks
 """
 
+
 @app.callback(Output("history_button", "disabled"),
               Input("past_settings", "data"),
               prevent_initial_call=True
               )
 def button_check(past_settings):
     return len(past_settings) <= 1
+
+
+@app.callback(Input("dropdown_menu", "value"),
+              Output("income_graph", "figure"),
+              )
+def create_income_graph(input_value):
+    return make_line_chart(input_value)
 
 
 if __name__ == "__main__":
