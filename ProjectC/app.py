@@ -76,8 +76,6 @@ Make Tabs
 
 # =======Play tab components
 
-asset_allocation_card = dbc.Card(asset_allocation_text, className="mt-2")
-
 dataframes = {
     "Natural Gas Prices": df2,
     "Minimum Wage": df3,
@@ -145,7 +143,7 @@ tabs = dbc.Tabs(
     [
         dbc.Tab(learn_card, tab_id="tab1", label="Learn"),
         dbc.Tab(
-            [asset_allocation_text, slider_card],
+            [slider_card],
             tab_id="tab-2",
             label="Play",
             className="pb-4",

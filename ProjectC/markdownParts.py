@@ -10,24 +10,10 @@ import dataProcessing
 Markdown Text
 """
 
-asset_allocation_text = dcc.Markdown(
-    """
-> Play with the app and see for yourself how prices of different basic items have changed over time in Idaho!
-"""
-)
-
 learn_text = dcc.Markdown(
     """
-    Idaho just below average in its costs of living compared to other States. I created a tool to explore different trends
+    Idaho falls just below average in its costs of living compared to other States. I created a tool to explore different trends
     over time and see how costs and wages have increased or decreased.
-    """
-)
-
-cagr_text = dcc.Markdown(
-    """
-    (CAGR) is the compound annual growth rate.  It measures the rate of return for an investment over a period of time, 
-    such as 5 or 10 years. The CAGR is also called a "smoothed" rate of return because it measures the growth of
-     an investment as if it had grown at a steady rate on an annually compounded basis.
     """
 )
 

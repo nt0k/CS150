@@ -15,6 +15,9 @@ df7 = pd.read_csv("assets/Boise State Cost.csv")
 # Fix date formatting
 df6['Date'] = pd.to_datetime(df6['Date'], format='%b %Y')
 
+df5 = df5.sort_values(by='Year', ascending=True)
+df2 = df2.sort_values(by='Year', ascending=True)
+
 
 """
 ==========================================================================
@@ -83,7 +86,6 @@ def percent_calculation(dff, date_column=None, value_column=None):
         avg_yearly_change = yearly_change.mean()  # Average yearly change
 
     # Format the results
-    result = f"Percent Change from Start to End: {percent_change:.1f}%\n"
-    result += f"Average Yearly Change: {avg_yearly_change:.1f}%"
+    result = f"Total Percent Change: {percent_change:.1f} || Average Yearly Change: {avg_yearly_change:.1f}%"
 
     return result
