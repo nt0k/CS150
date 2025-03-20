@@ -57,20 +57,17 @@ def make_line_chart(dff):
     fig.add_trace(
         go.Scatter(
             x=dff["Year"],
-            y=dff[1],
-            name=dff.name,
+            y=dff.iloc[:, 1],
             marker_color=COLORS["cash"],
         )
     )
     fig.update_layout(
-        title=f"Returns for {yrs} years starting {start}",
+        title=f"{dff.columns[1]} in Idaho over the last {yrs} years",
         template="none",
-        showlegend=True,
-        legend=dict(x=0.01, y=0.99),
         height=400,
         margin=dict(l=40, r=10, t=60, b=55),
-        yaxis=dict(tickprefix="$", fixedrange=True),
-        xaxis=dict(title="Year Ended", fixedrange=True, dtick=dtick),
+        yaxis= dict(range=[0, None], tickprefix="$", fixedrange=True),
+        xaxis=dict(title="Year", fixedrange=True, dtick=dtick),
     )
     return fig
 
@@ -123,34 +120,6 @@ slider_card = dbc.Card(
     className="mt-4",
 )
 
-time_period_data = [
-    {
-        "label": f"2007-2008: Great Financial Crisis to {MAX_YR}",
-        "start_yr": 2007,
-        "planning_time": MAX_YR - START_YR + 1,
-    },
-    {
-        "label": "1999-2010: The decade including 2000 Dotcom Bubble peak",
-        "start_yr": 1999,
-        "planning_time": 10,
-    },
-    {
-        "label": "1969-1979:  The 1970s Energy Crisis",
-        "start_yr": 1970,
-        "planning_time": 10,
-    },
-    {
-        "label": "1929-1948:  The 20 years following the start of the Great Depression",
-        "start_yr": 1929,
-        "planning_time": 20,
-    },
-    {
-        "label": f"{MIN_YR}-{MAX_YR}",
-        "start_yr": "1928",
-        "planning_time": MAX_YR - MIN_YR + 1,
-    },
-]
-
 # ======= InputGroup components
 
 start_amount = dbc.InputGroup(
@@ -166,75 +135,9 @@ start_amount = dbc.InputGroup(
     ],
     className="mb-3",
 )
-start_year = dbc.InputGroup(
-    [
-        dbc.InputGroupText("Start Year"),
-        dbc.Input(
-            id="start_yr",
-            placeholder=f"min {MIN_YR}   max {MAX_YR}",
-            type="number",
-            min=MIN_YR,
-            max=MAX_YR,
-            value=START_YR,
-        ),
-    ],
-    className="mb-3",
-)
-number_of_years = dbc.InputGroup(
-    [
-        dbc.InputGroupText("Number of Years:"),
-        dbc.Input(
-            id="planning_time",
-            placeholder="# yrs",
-            type="number",
-            min=1,
-            value=MAX_YR - START_YR + 1,
-        ),
-    ],
-    className="mb-3",
-)
-end_amount = dbc.InputGroup(
-    [
-        dbc.InputGroupText("Ending Amount"),
-        dbc.Input(id="ending_amount", disabled=True, className="text-black"),
-    ],
-    className="mb-3",
-)
-rate_of_return = dbc.InputGroup(
-    [
-        dbc.InputGroupText(
-            "Rate of Return(CAGR)",
-            id="tooltip_target",
-            className="text-decoration-underline",
-        ),
-        dbc.Input(id="cagr", disabled=True, className="text-black"),
-        dbc.Tooltip(cagr_text, target="tooltip_target"),
-    ],
-    className="mb-3",
-)
-
-input_groups = html.Div(
-    [start_amount, start_year, number_of_years, end_amount, rate_of_return],
-    className="mt-4 p-4",
-)
 
 # =====  Results Tab components
 
-results_card = dbc.Card(
-    [
-        dbc.CardHeader("My Portfolio Returns - Rebalanced Annually"),
-        html.Div(total_returns_table),
-    ],
-    className="mt-4",
-)
-
-data_source_card = dbc.Card(
-    [
-        dbc.CardHeader("Source Data: Annual Total Returns"),
-        html.Div(annual_returns_pct_table),
-    ],
-    className="mt-4",
-)
 
 # ========= Learn Tab  Components
 learn_card = dbc.Card(
@@ -259,7 +162,7 @@ tabs = dbc.Tabs(
     [
         dbc.Tab(learn_card, tab_id="tab1", label="Learn"),
         dbc.Tab(
-            [asset_allocation_text, slider_card, input_groups],
+            [asset_allocation_text, slider_card],
             tab_id="tab-2",
             label="Play",
             className="pb-4",
@@ -297,7 +200,7 @@ app.layout = dbc.Container(
                 dbc.Col(tabs, width=12, lg=5, className="mt-4 border"),
                 dbc.Col(
                     [
-                        dcc.Graph(id="income_graph", className="mb-2"),
+                        dcc.Graph(id="income_graph", figure = make_line_chart(df1), className="mb-2"),
                         dcc.Graph(id="returns_chart", className="pb-4"),
                         html.Hr(),
                         html.H6(datasource_text, className="my-2"),
@@ -326,13 +229,6 @@ Callbacks
               )
 def button_check(past_settings):
     return len(past_settings) <= 1
-
-
-@app.callback(Input("dropdown_menu", "value"),
-              Output("income_graph", "figure"),
-              )
-def create_income_graph(input_value):
-    return make_line_chart(input_value)
 
 
 if __name__ == "__main__":
