@@ -10,12 +10,6 @@ import dataProcessing
 Markdown Text
 """
 
-datasource_text = dcc.Markdown(
-    """
-    Data pulled from fred.stlouisfed.org and www.eia.gov.
-    """
-)
-
 asset_allocation_text = dcc.Markdown(
     """
 > Play with the app and see for yourself how prices of different basic items have changed over time in Idaho!
@@ -41,9 +35,9 @@ footer = html.Div(
     dcc.Markdown(
         """
          This information is intended solely as general information for educational
-        and entertainment purposes only. 
+        and entertainment purposes only. Data pulled from fred.stlouisfed.org, www.eia.gov, 
+        www.collegetuitioncompare.com, and data.bls.gov.
         """
     ),
-    className="p-2 mt-5 bg-primary text-white small",
+    className="p-2 mt-3 bg-primary text-white small d-flex justify-content-center align-items-center",
 )
-

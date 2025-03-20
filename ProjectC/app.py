@@ -9,11 +9,11 @@ from markdownParts import *
 
 app = Dash(
     __name__,
-    external_stylesheets=[dbc.themes.MINTY, dbc.icons.FONT_AWESOME],
+    external_stylesheets=[dbc.themes.YETI, dbc.icons.FONT_AWESOME],
 )
 
 COLORS = {
-    "cash": "#3cb521",
+    "cash": "#008cba",
     "bonds": "#fd7e14",
     "stocks": "#446e9b",
     "inflation": "#cd0200",
@@ -26,50 +26,47 @@ Figures
 """
 
 
-def make_tree_map(slider_input, title):
-    fig = px.treemap(
-        names=["Cash", "Bonds", "Stocks"],
-        values=slider_input,
-        parents=["", "", ""],
-        color=["Cash", "Bonds", "Stocks"],
-        color_discrete_map={
-            "Cash": COLORS["cash"],
-            "Bonds": COLORS["bonds"],
-            "Stocks": COLORS["stocks"]
-        }
-    )
-    fig.update_layout(
-        title_text=title,
-        title_x=0.5,
-        margin=dict(b=25, t=75, l=35, r=25),
-        height=325,
-        paper_bgcolor=COLORS["background"],
-    )
-    return fig
-
-
 def make_line_chart(dff):
-    start = dff.loc[1, "Year"]
-    yrs = dff["Year"].size - 1
-    dtick = 1 if yrs < 16 else 2 if yrs in range(16, 30) else 5
-
-    fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            x=dff["Year"],
-            y=dff.iloc[:, 1],
-            marker_color=COLORS["cash"],
+    if "Year" not in dff.columns:
+        fig = go.Figure()
+        fig.add_trace(
+            go.Scatter(
+                x=dff["Date"],
+                y=dff.iloc[:, 1],
+                marker_color=COLORS["cash"],
+            )
         )
-    )
-    fig.update_layout(
-        title=f"{dff.columns[1]} in Idaho over the last {yrs} years",
-        template="none",
-        height=400,
-        margin=dict(l=40, r=10, t=60, b=55),
-        yaxis= dict(range=[0, None], tickprefix="$", fixedrange=True),
-        xaxis=dict(title="Year", fixedrange=True, dtick=dtick),
-    )
-    return fig
+        fig.update_layout(
+            title=f"{dff.columns[1]}",
+            template="none",
+            height=400,
+            margin=dict(l=40, r=10, t=60, b=55),
+            yaxis=dict(range=[0, None], tickprefix="$", fixedrange=True),
+            xaxis=dict(title="Year", fixedrange=True),
+        )
+        return fig
+    else:
+        start = dff.loc[1, "Year"]
+        yrs = dff["Year"].size - 1
+        dtick = 1 if yrs < 16 else 2 if yrs in range(16, 30) else 5
+
+        fig = go.Figure()
+        fig.add_trace(
+            go.Scatter(
+                x=dff["Year"],
+                y=dff.iloc[:, 1],
+                marker_color=COLORS["cash"],
+            )
+        )
+        fig.update_layout(
+            title=f"{dff.columns[1]} in Idaho over the last {yrs} years",
+            template="none",
+            height=400,
+            margin=dict(l=40, r=10, t=60, b=55),
+            yaxis=dict(range=[0, None], tickprefix="$", fixedrange=True),
+            xaxis=dict(title="Year", fixedrange=True, dtick=dtick),
+        )
+        return fig
 
 
 """
@@ -81,37 +78,23 @@ Make Tabs
 
 asset_allocation_card = dbc.Card(asset_allocation_text, className="mt-2")
 
+dataframes = {
+    "Natural Gas Prices": df2,
+    "Minimum Wage": df3,
+    "Median Home Price": df4,
+    "Energy Cost": df5,
+    "Ground Beef Price": df6,
+    "Boise State University Cost": df7,
+}
+
 slider_card = dbc.Card(
     [
-        html.H4("First set cash allocation %:", className="card-title"),
-        dcc.Slider(
-            id="cash",
-            marks={i: f"{i}%" for i in range(0, 101, 10)},
-            min=0,
-            max=100,
-            step=5,
-            value=10,
-            included=False,
-        ),
-        html.H4(
-            "Then set stock allocation % ",
-            className="card-title mt-3",
-        ),
-        dcc.Slider(
-            id="stock_bond",
-            marks={i: f"{i}%" for i in range(0, 91, 10)},
-            min=0,
-            max=90,
-            step=5,
-            value=50,
-            included=False,
-        ),
-        html.Div(
-            [
-                html.H4("Bond allocation: ", style={'display': 'inline-block', 'margin-right': '5px'}),
-                html.H4(id="bond_amount", children="", style={'display': 'inline-block'})
-            ],
-            className="card-title mt-3"
+        html.H4("Select Which Segment to Examine", className="card-title"),
+        dcc.Dropdown(
+            id='segment_dropdown',
+            options=[{"label": label, "value": label} for label in dataframes.keys()],
+            value="Median Home Price",  # Set default value
+            className="mb-4",
         ),
         dbc.Button("Use Prior Setting", id="history_button", color="primary", className="me-2", n_clicks=0,
                    disabled=True),
@@ -200,10 +183,12 @@ app.layout = dbc.Container(
                 dbc.Col(tabs, width=12, lg=5, className="mt-4 border"),
                 dbc.Col(
                     [
-                        dcc.Graph(id="income_graph", figure = make_line_chart(df1), className="mb-2"),
-                        dcc.Graph(id="returns_chart", className="pb-4"),
+                        dcc.Graph(id="income_graph", figure=make_line_chart(df1), className="mb-2"),
+                        html.P(percent_calculation(df1, None, "Idaho Median Income")),
                         html.Hr(),
-                        html.H6(datasource_text, className="my-2"),
+                        dcc.Graph(id="comparison_graph", className="pb-4"),
+                        html.P(id="comparison_text"),
+                        html.Hr(),
                     ],
                     width=12,
                     lg=7,
@@ -229,6 +214,20 @@ Callbacks
               )
 def button_check(past_settings):
     return len(past_settings) <= 1
+
+
+@app.callback(Output("comparison_graph", "figure"),
+              Output("comparison_text", "children"),
+              Input("segment_dropdown", "value"),
+              )
+def update_comparison_graph(selected_val):
+    print(selected_val)
+    if selected_val == "Median Home Price" or selected_val == "Ground Beef Price":
+        return make_line_chart(dataframes[selected_val]), percent_calculation(dataframes[selected_val], "Date",
+                                                                              dataframes[selected_val].columns[1])
+    else:
+        return make_line_chart(dataframes[selected_val]), percent_calculation(dataframes[selected_val], None,
+                                                                              dataframes[selected_val].columns[1])
 
 
 if __name__ == "__main__":
