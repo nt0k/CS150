@@ -86,6 +86,6 @@ def percent_calculation(dff, date_column=None, value_column=None):
         avg_yearly_change = yearly_change.mean()  # Average yearly change
 
     # Format the results
-    result = f"Total Percent Change: {percent_change:.1f} || Average Yearly Change: {avg_yearly_change:.1f}%"
+    result = f"Total Percent Change: {percent_change:.1f}% || Average Yearly Change: {avg_yearly_change:.1f}%"
 
     return result

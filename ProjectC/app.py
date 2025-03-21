@@ -94,7 +94,9 @@ slider_card = dbc.Card(
             value="Median Home Price",  # Set default value
             className="mb-4",
         ),
-        dbc.Button("Use Prior Setting", id="history_button", color="primary", className="me-2", n_clicks=0,
+        dbc.Button("Use Consistent Years", id="consistent_button", color="primary", className="me-2", n_clicks=0,
+                   disabled=False),
+        dbc.Button("Use All Available Data", id="all_button", color="primary", className="me-2", n_clicks=0,
                    disabled=True),
     ],
     body=True,
@@ -129,7 +131,7 @@ learn_card = dbc.Card(
     className="mt-4",
 )
 
-# ========= Past Settings Tab  Components
+# ========= Past Settings Tab  Components for reference only
 past_setting_card = dbc.Card(
     [
         dbc.CardHeader("Previous Settings"),
@@ -148,7 +150,6 @@ tabs = dbc.Tabs(
             label="Play",
             className="pb-4",
         ),
-        dbc.Tab(past_setting_card, tab_id="tab-4", label="Previous Settings"),
     ],
     id="tabs",
     active_tab="tab-2",
@@ -206,12 +207,28 @@ Callbacks
 """
 
 
-@app.callback(Output("history_button", "disabled"),
-              Input("past_settings", "data"),
-              prevent_initial_call=True
-              )
-def button_check(past_settings):
-    return len(past_settings) <= 1
+@app.callback(
+    Output("all_button", "disabled", allow_duplicate=True),
+    Output("consistent_button", "disabled", allow_duplicate=True),
+    Input("consistent_button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def toggle_all(n_clicks):
+    if n_clicks == 0:
+        return True  # Keep "All" button disabled initially
+    return False, True  # Enable "All" button when "Consistent" is clicked
+
+
+@app.callback(
+    Output("consistent_button", "disabled", allow_duplicate=True),
+    Output("all_button", "disabled", allow_duplicate=True),
+    Input("all_button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def toggle_consistent(n_clicks):
+    if n_clicks == 0:
+        return False  # Keep "Consistent" button enabled initially
+    return False, True  # Disable "Consistent" button when "All" is clicked
 
 
 @app.callback(Output("comparison_graph", "figure"),
