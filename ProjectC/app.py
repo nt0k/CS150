@@ -5,7 +5,6 @@ import plotly.graph_objects as go
 import pandas as pd
 import plotly.express as px
 
-from Lab4.app import make_line_chart
 from dataProcessing import *
 from markdownParts import *
 
@@ -98,10 +97,12 @@ slider_card = dbc.Card(
             value="Median Home Price",  # Set default value
             className="mb-4",
         ),
-        dbc.Button("Use Consistent Years", id="consistent_button", color="primary", className="me-2", n_clicks=0,
-                   disabled=False),
-        dbc.Button("Use All Available Data", id="all_button", color="primary", className="me-2", n_clicks=0,
-                   disabled=True),
+        # I found myself unable to get this functionality working in time :(
+        #
+        # dbc.Button("Use Consistent Years", id="consistent_button", color="primary", className="me-2", n_clicks=0,
+        #           disabled=False),
+        # dbc.Button("Use All Available Data", id="all_button", color="primary", className="me-2", n_clicks=0,
+        #           disabled=True),
     ],
     body=True,
     className="mt-4",
@@ -171,10 +172,11 @@ app.layout = dbc.Container(
                 dbc.Col(
                     [
                         dcc.Graph(id="income_graph", figure=make_line_chart(df1), className="mb-2"),
-                        html.P(percent_calculation(df1, None, "Idaho Median Income")),
+                        html.P(percent_calculation(df1, None, "Idaho Median Income"), style={"textAlign": "center"}),
                         dcc.Graph(id="comparison_graph", figure=make_line_chart(df4), className="pb-2"),
                         html.P(id="comparison_text",
-                               children=percent_calculation(df4, "Date", "Idaho Median House Price of Listings")),
+                               children=percent_calculation(df4, "Date", "Idaho Median House Price of Listings"),
+                               style={"textAlign": "center"}),
                         html.Hr(),
                     ],
                     width=12,
@@ -194,36 +196,76 @@ app.layout = dbc.Container(
 Callbacks
 """
 
+'''
+I found myself unable to get this functionality working in time :(
 
 @app.callback(
     Output("all_button", "disabled", allow_duplicate=True),
     Output("consistent_button", "disabled", allow_duplicate=True),
+    Output("comparison_graph", "figure", allow_duplicate=True),
+    Output("income_graph", "figure", allow_duplicate=True),
     Input("consistent_button", "n_clicks"),
+    State("comparison_graph", "figure"),
+    State("income_graph", "figure"),
     prevent_initial_call=True,
 )
-def toggle_all(n_clicks):
+def toggle_all(n_clicks, fig1, fig2):
     if n_clicks == 0:
         return True  # Keep "All" button disabled initially
-    return False, True  # Enable "All" button when "Consistent" is clicked
+
+    comparison_graph = go.Figure(fig1)
+    income_graph = go.Figure(fig2)
+
+    comparison_graph.update_layout(
+        xaxis=dict(
+            range=["2017-01-01", "2023-12-31"]  # Limit x-axis to 2017-2023
+        )
+    )
+    income_graph.update_layout(
+        xaxis=dict(
+            range=["2017-01-01", "2023-12-31"]  # Limit x-axis to 2017-2023
+        )
+    )
+    return False, True, comparison_graph, income_graph # Enable "All" button when "Consistent" is clicked
 
 
 @app.callback(
     Output("consistent_button", "disabled", allow_duplicate=True),
     Output("all_button", "disabled", allow_duplicate=True),
+    Output("comparison_graph", "figure", allow_duplicate=True),
+    Output("income_graph", "figure", allow_duplicate=True),
     Input("all_button", "n_clicks"),
+    State("comparison_graph", "figure"),
+    State("income_graph", "figure"),
     prevent_initial_call=True,
 )
-def toggle_consistent(n_clicks):
+def toggle_consistent(n_clicks, fig1, fig2):
     if n_clicks == 0:
         return False  # Keep "Consistent" button enabled initially
-    return False, True  # Disable "Consistent" button when "All" is clicked
+
+    comparison_graph = go.Figure(fig1)
+    income_graph = go.Figure(fig2)
+
+    comparison_graph.update_layout(
+        xaxis=dict(
+            range=None  # This will remove the custom range and let Plotly auto-calculate
+        )
+    )
+    income_graph.update_layout(
+        xaxis=dict(
+            range=None  # This will remove the custom range and let Plotly auto-calculate
+        )
+    )
+    return False, True, comparison_graph, income_graph  # Disable "Consistent" button when "All" is clicked
+'''
 
 
-@app.callback(Output("comparison_graph", "figure"),
-              Output("comparison_text", "children"),
-              Input("segment_dropdown", "value"),
-              prevent_initial_call=True,
-              )
+@app.callback(
+    Output("comparison_graph", "figure"),
+    Output("comparison_text", "children"),
+    Input("segment_dropdown", "value"),
+    prevent_initial_call=True,
+)
 def update_comparison_graph(selected_val):
     if selected_val == "Median Home Price" or selected_val == "Ground Beef Price":
         return make_line_chart(dataframes[selected_val]), percent_calculation(dataframes[selected_val], "Date",

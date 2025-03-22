@@ -16,7 +16,8 @@ I chose median household income and minimum wage in Idaho to show what people ar
 wage might interact with it. I chose median listing price of houses in Idaho as my capital expense for a typical person
 or family. For another capital expense, I looked at tuition to Boise State University because it is the largest school in
 Idaho. For small regular expenses I pulled in data on ground beef, natural gas (for heating homes) and also general
-electricity prices. 
+electricity prices. The ground beef data set is for the West Region of the U.S. which includes Idaho, state level price
+data of specific goods was not readily available.
 
 **Citations**
 Median Income.csv
