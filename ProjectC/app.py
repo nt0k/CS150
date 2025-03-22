@@ -4,6 +4,8 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import pandas as pd
 import plotly.express as px
+
+from Lab4.app import make_line_chart
 from dataProcessing import *
 from markdownParts import *
 
@@ -13,11 +15,7 @@ app = Dash(
 )
 
 COLORS = {
-    "cash": "#008cba",
-    "bonds": "#fd7e14",
-    "stocks": "#446e9b",
-    "inflation": "#cd0200",
-    "background": "whitesmoke",
+    "blue": "#008cba",
 }
 
 """
@@ -33,16 +31,22 @@ def make_line_chart(dff):
             go.Scatter(
                 x=dff["Date"],
                 y=dff.iloc[:, 1],
-                marker_color=COLORS["cash"],
+                marker_color=COLORS["blue"],
             )
         )
+        # Generated with help from ChatGPT prompt "have my graph function only display certain months"
         fig.update_layout(
             title=f"{dff.columns[1]}",
             template="none",
-            height=400,
-            margin=dict(l=40, r=10, t=60, b=55),
+            height=350,
+            margin=dict(l=40, r=10, t=30, b=35),
             yaxis=dict(range=[0, None], tickprefix="$", fixedrange=True),
-            xaxis=dict(title="Year", fixedrange=True),
+            xaxis=dict(
+                title="Year",
+                fixedrange=True,
+                dtick="M12",  # Every 6 months to reduce clutter
+                tickformat="%m-%Y",  # Format to display Month-Year (MM-YYYY)
+            )
         )
         return fig
     else:
@@ -55,14 +59,14 @@ def make_line_chart(dff):
             go.Scatter(
                 x=dff["Year"],
                 y=dff.iloc[:, 1],
-                marker_color=COLORS["cash"],
+                marker_color=COLORS["blue"],
             )
         )
         fig.update_layout(
             title=f"{dff.columns[1]} in Idaho over the last {yrs} years",
             template="none",
-            height=400,
-            margin=dict(l=40, r=10, t=60, b=55),
+            height=350,
+            margin=dict(l=40, r=10, t=30, b=35),
             yaxis=dict(range=[0, None], tickprefix="$", fixedrange=True),
             xaxis=dict(title="Year", fixedrange=True, dtick=dtick),
         )
@@ -103,25 +107,6 @@ slider_card = dbc.Card(
     className="mt-4",
 )
 
-# ======= InputGroup components
-
-start_amount = dbc.InputGroup(
-    [
-        dbc.InputGroupText("Start Amount $"),
-        dbc.Input(
-            id="starting_amount",
-            placeholder="Min $10",
-            type="number",
-            min=10,
-            value=10000,
-        ),
-    ],
-    className="mb-3",
-)
-
-# =====  Results Tab components
-
-
 # ========= Learn Tab  Components
 learn_card = dbc.Card(
     [
@@ -131,11 +116,13 @@ learn_card = dbc.Card(
     className="mt-4",
 )
 
-# ========= Past Settings Tab  Components for reference only
-past_setting_card = dbc.Card(
+# ========= Raw Data Tab
+tables_card = dbc.Card(
     [
-        dbc.CardHeader("Previous Settings"),
-        dbc.CardBody(past_settings_table),
+        dbc.CardHeader("Raw Data"),
+        dbc.CardBody([
+            generate_table(df, f"{df.columns[1]}") for df in [df1, df2, df3, df4, df5, df6, df7]
+        ]),
     ],
     className="mt-4",
 )
@@ -143,13 +130,14 @@ past_setting_card = dbc.Card(
 # ========= Build tabs
 tabs = dbc.Tabs(
     [
-        dbc.Tab(learn_card, tab_id="tab1", label="Learn"),
+        dbc.Tab(learn_card, tab_id="tab1", label="About"),
         dbc.Tab(
             [slider_card],
             tab_id="tab-2",
             label="Play",
             className="pb-4",
         ),
+        dbc.Tab(tables_card, tab_id="tab3", label="Raw Data", className="pb-4"),
     ],
     id="tabs",
     active_tab="tab-2",
@@ -184,9 +172,9 @@ app.layout = dbc.Container(
                     [
                         dcc.Graph(id="income_graph", figure=make_line_chart(df1), className="mb-2"),
                         html.P(percent_calculation(df1, None, "Idaho Median Income")),
-                        html.Hr(),
-                        dcc.Graph(id="comparison_graph", className="pb-4"),
-                        html.P(id="comparison_text"),
+                        dcc.Graph(id="comparison_graph", figure=make_line_chart(df4), className="pb-2"),
+                        html.P(id="comparison_text",
+                               children=percent_calculation(df4, "Date", "Idaho Median House Price of Listings")),
                         html.Hr(),
                     ],
                     width=12,
@@ -234,9 +222,9 @@ def toggle_consistent(n_clicks):
 @app.callback(Output("comparison_graph", "figure"),
               Output("comparison_text", "children"),
               Input("segment_dropdown", "value"),
+              prevent_initial_call=True,
               )
 def update_comparison_graph(selected_val):
-    print(selected_val)
     if selected_val == "Median Home Price" or selected_val == "Ground Beef Price":
         return make_line_chart(dataframes[selected_val]), percent_calculation(dataframes[selected_val], "Date",
                                                                               dataframes[selected_val].columns[1])

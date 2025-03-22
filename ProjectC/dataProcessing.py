@@ -14,7 +14,12 @@ df7 = pd.read_csv("assets/Boise State Cost.csv")
 
 # Fix date formatting
 df6['Date'] = pd.to_datetime(df6['Date'], format='%b %Y')
-
+df4['Date'] = pd.to_datetime(df4['Date'], format="%Y-%m-%d")
+print(df6.head())
+print(df4.head())
+#exit()
+df6 = df6.sort_values(by=['Date'], ascending=True)
+df4 = df4.sort_values(by=['Date'], ascending=True)
 df5 = df5.sort_values(by='Year', ascending=True)
 df2 = df2.sort_values(by='Year', ascending=True)
 
@@ -23,9 +28,8 @@ df2 = df2.sort_values(by='Year', ascending=True)
 ==========================================================================
 Tables
 """
-store = dcc.Store(id="past_settings_store", data=[])
-past_settings_table = dash_table.DataTable(
-    id="past_settings",
+raw_data_table = dash_table.DataTable(
+    id="raw_data_table",
     columns=[
         {"name": "Cash Allocation", "id": "cash_allocation"},
         {"name": "Stock Allocation", "id": "stock_allocation"},
@@ -36,12 +40,12 @@ past_settings_table = dash_table.DataTable(
     ],
     page_size=15,
     style_table={"overflowX": "scroll"},
-    data=[],  # Dynamically updated
+    data=[],
 )
 
 """
 ==========================================================================
-Helper functions to calculate investment results, cagr and worst periods
+Helper functions
 """
 
 
@@ -59,11 +63,11 @@ def percent_calculation(dff, date_column=None, value_column=None):
 
     # If we are working with monthly data, extract the year and month from the date
     if date_column:
-        # Convert the 'Date' column to datetime
-        dff[date_column] = pd.to_datetime(dff[date_column])
+
+        dff_copy = dff.copy()
         # Extract the year and month
-        dff['Year'] = dff[date_column].dt.year
-        dff['Month'] = dff[date_column].dt.month
+        dff_copy['Year'] = dff_copy[date_column].dt.year
+        dff_copy['Month'] = dff_copy[date_column].dt.month
 
         # Calculate the percent change from first to last value
         start_val = dff[value_column].iloc[0]  # First value
@@ -71,7 +75,7 @@ def percent_calculation(dff, date_column=None, value_column=None):
         percent_change = ((end_val - start_val) / start_val) * 100
 
         # Calculate the average yearly change
-        yearly_data = dff.groupby('Year')[value_column].last()  # Get the last value of each year
+        yearly_data = dff_copy.groupby('Year')[value_column].last()  # Get the last value of each year
         yearly_change = yearly_data.pct_change() * 100  # Percent change between years
         avg_yearly_change = yearly_change.mean()  # Average yearly change
 
@@ -89,3 +93,15 @@ def percent_calculation(dff, date_column=None, value_column=None):
     result = f"Total Percent Change: {percent_change:.1f}% || Average Yearly Change: {avg_yearly_change:.1f}%"
 
     return result
+
+def generate_table(df, title):
+    return html.Div([
+        html.H4(title),
+        dash_table.DataTable(
+            columns=[{"name": col, "id": col} for col in df.columns],
+            data=df.to_dict("records"),
+            style_table={"overflowX": "auto"},
+            style_cell={"textAlign": "left"},
+            page_size=10
+        )
+    ])
