@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import dash_bootstrap_components
 from dash import Dash, dcc, html, dash_table, Input, Output, State, callback_context
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
@@ -16,6 +17,9 @@ app = Dash(
 COLORS = {
     "blue": "#008cba",
 }
+
+# Load processed data
+df1, df2, df3, df4, df5, df6, df7 = load_and_process_data()
 
 """
 ==========================================================================
@@ -38,21 +42,17 @@ def make_line_chart(dff):
             title=f"{dff.columns[1]}",
             template="none",
             height=350,
-            margin=dict(l=40, r=10, t=30, b=35),
+            margin=dict(l=40, r=10, t=30, b=50),
             yaxis=dict(range=[0, None], tickprefix="$", fixedrange=True),
             xaxis=dict(
                 title="Year",
                 fixedrange=True,
-                dtick="M12",  # Every 6 months to reduce clutter
-                tickformat="%m-%Y",  # Format to display Month-Year (MM-YYYY)
+                dtick="M12",  # Every 12 months to reduce clutter
+                tickformat="%Y",  # Format to display Month-Year (MM-YYYY)
             )
         )
         return fig
     else:
-        start = dff.loc[1, "Year"]
-        yrs = dff["Year"].size - 1
-        dtick = 1 if yrs < 16 else 2 if yrs in range(16, 30) else 5
-
         fig = go.Figure()
         fig.add_trace(
             go.Scatter(
@@ -62,12 +62,12 @@ def make_line_chart(dff):
             )
         )
         fig.update_layout(
-            title=f"{dff.columns[1]} in Idaho over the last {yrs} years",
+            title=f"{dff.columns[1]}",
             template="none",
             height=350,
-            margin=dict(l=40, r=10, t=30, b=35),
+            margin=dict(l=40, r=10, t=30, b=50),
             yaxis=dict(range=[0, None], tickprefix="$", fixedrange=True),
-            xaxis=dict(title="Year", fixedrange=True, dtick=dtick),
+            xaxis=dict(title="Year", fixedrange=True, tickformat="%Y"),
         )
         return fig
 
