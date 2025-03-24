@@ -53,3 +53,8 @@ all that is visible are the two graphs, tab selection, and input fields. The y-a
 1. The cost of tuition is rising fast that income is rising, so education is becoming less affordable.
 2. Low cost items like beef and energy rose much less than income, so basic necessities are becoming more affordable.
 3. Housing has increased much faster than income, Idaho follows other national trends of housing becoming more expensive.
+
+
+**Feedback Update:** I recieved feedback from my classmates and Mike that my graphs should show only the same years
+to have a more accurate comparison. I went back, cleaned my data and now the graphs only show comparisons across consistent
+timelines.
