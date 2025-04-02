@@ -62,7 +62,10 @@ def classify_svm(df, test_size=0.2, c_param=1.0, kernel='rbf'):
     accuracy = accuracy_score(y_test, y_pred)
     print(f"SVM Accuracy: {accuracy:.2f}")
 
-    return accuracy #return the accuracy, so it can be used elsewhere.
+    # Convert y_test and y_pred to DataFrame for visualization
+    results_df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+
+    return accuracy, results_df
 
 df = pull_and_clean_data()
 accuracy = classify_svm(df, test_size=0.3, c_param=0.5, kernel='linear') # example of how to change the parameters.
