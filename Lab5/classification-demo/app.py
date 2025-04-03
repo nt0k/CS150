@@ -16,7 +16,8 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE])
 
 app.layout = html.Div(className="app-container", children=[
     html.H1(style={"textAlign": "center"}, className="title mb-3 mt-2", children='Credit Card Approval SVM Prediction'),
-    html.Div(style={"textAlign": "center"}, className="subtitle mb-3", children='By Nathan Kirk for CS150'),
+    html.Div(style={"textAlign": "center"}, className="subtitle mb-3",
+             children='By Nathan Kirk for CS150 | nkirk@westmont.edu'),
 
     dbc.Row([
         dbc.Col(html.Div(id="left-column", className="m-2", children=[
@@ -26,11 +27,16 @@ app.layout = html.Div(className="app-container", children=[
                        children="This model tries to predict if a person will get approved for a"
                                 "credit card by looking at factors such as age, income, employment"
                                 "and many others. Try playing around with the factors below and see"
-                                "how it impacts the confusion matrix and ROC curve!"),
-                drc.NamedSlider("Test Size", id="test_size_slider", min=0.1, max=0.9, step=0.1, value=0.4),
+                                "how it impacts the confusion matrix and ROC curve! The test percentage"
+                                " controls how much of the data is used for training the model. The regulation"
+                                " parameter controls the trade-off between the model's complexity and its ability "
+                                "to classify training data correctly. And the function type determines what type "
+                                "of function the model should use to separate the data."),
+                drc.NamedSlider("Test Percentage", id="test_size_slider", min=0.1, max=0.9, step=0.1, value=0.4),
                 drc.NamedSlider("Regulation Parameter", id="c_param_slider", min=0.1, max=1, step=0.1, value=1),
-                drc.NamedDropdown("Kernel", id="kernel_dropdown", options=['linear', 'poly', 'sigmoid'],
+                drc.NamedDropdown("Function Type (Kernel)", id="kernel_dropdown", options=['linear', 'poly', 'sigmoid'],
                                   value="poly"),
+                dbc.Button("Reset Settings", id="reset_button", n_clicks=0, className="m-2"),
             ])
         ]), width=6, align="center"),
 
@@ -96,6 +102,16 @@ def update_model_graph(test_size, c_param, kernel_dropdown):
     fig = go.Figure(data=data, layout=layout)
 
     return fig, table
+
+
+@app.callback(
+    Output("test_size_slider", "value"),
+    Output("c_param_slider", "value"),
+    Output("kernel_dropdown", "value"),
+    Input("reset_button", "n_clicks"),
+)
+def reset(clicks):
+    return 0.4, 1, "poly"
 
 
 if __name__ == '__main__':
