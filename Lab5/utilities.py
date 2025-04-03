@@ -7,8 +7,10 @@ from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from Lab5.ingestion import *
+from sklearn.metrics import confusion_matrix
 
-def classify_svm(df, test_size=0.2, c_param=1.0, kernel='rbf'):
+
+def classify_svm(df, test_size=0.2, c_param=1.0, kernel='linear'):
     """
     Classifies data using an SVM with configurable parameters.
 
@@ -16,9 +18,13 @@ def classify_svm(df, test_size=0.2, c_param=1.0, kernel='rbf'):
         df (pd.DataFrame): The input DataFrame.
         test_size (float, optional): The proportion of the dataset to include in the test split. Defaults to 0.2.
         c_param (float, optional): Regularization parameter C of the SVM. Defaults to 1.0.
-        kernel (str, optional): Specifies the kernel type to be used in the algorithm. Defaults to 'rbf'.
+        kernel (str, optional): Specifies the kernel type to be used in the algorithm. Defaults to 'linear'.
     Returns:
-        float: The accuracy of the SVM model.
+        Accuracy
+        Confusion Matrix (broken into TP, FP, TN, FN)
+        Model
+        X_test
+        Y_test
     """
 
     X = df[[
@@ -53,19 +59,19 @@ def classify_svm(df, test_size=0.2, c_param=1.0, kernel='rbf'):
         ])
 
     model = Pipeline(steps=[('preprocessor', preprocessor),
-                               ('classifier', SVC(random_state=42, C=c_param, kernel=kernel))])
+                            ('classifier', SVC(random_state=42, C=c_param, kernel=kernel))])
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
 
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
-    print(f"SVM Accuracy: {accuracy:.2f}")
+    # Compute confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+    TN, FP, FN, TP = cm.ravel()
 
-    # Convert y_test and y_pred to DataFrame for visualization
-    results_df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+    return accuracy, TP, FP, TN, FN, model, X_test, y_test
 
-    return accuracy, results_df
 
 df = pull_and_clean_data()
-accuracy = classify_svm(df, test_size=0.3, c_param=0.5, kernel='linear') # example of how to change the parameters.
+accuracy = classify_svm(df, test_size=0.3, c_param=0.5, kernel='linear')
