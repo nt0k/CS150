@@ -27,19 +27,7 @@ def classify_svm(df, test_size=0.2, c_param=1.0, kernel='linear'):
         Y_test
     """
 
-    X = df[[
-        "Birthday_count",
-        "Annual_income",
-        "Employed_days",
-        "Family_Members",
-        "CHILDREN",
-        "Property_Owner",
-        "Phone",
-        "Car_Owner",
-        "Work_Phone",
-        "GENDER",
-        "Type_Income"
-    ]]
+    X = df.drop(columns=["label"])
     y = df["label"]
 
     categorical_cols = X.select_dtypes(include=['object']).columns.tolist()
@@ -68,10 +56,6 @@ def classify_svm(df, test_size=0.2, c_param=1.0, kernel='linear'):
     accuracy = accuracy_score(y_test, y_pred)
     # Compute confusion matrix
     cm = confusion_matrix(y_test, y_pred)
-    TN, FP, FN, TP = cm.ravel()
+    TN, FP, FN, TP = cm[0][0], cm[0][1], cm[1][0], cm[1][1]
 
     return accuracy, TP, FP, TN, FN, model, X_test, y_test
-
-
-df = pull_and_clean_data()
-accuracy = classify_svm(df, test_size=0.3, c_param=0.5, kernel='linear')

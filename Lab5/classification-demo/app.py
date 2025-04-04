@@ -11,6 +11,8 @@ from Lab5 import utilities
 import plotly.figure_factory as ff
 import dash_bootstrap_components as dbc
 from sklearn import metrics
+from sklearn.decomposition import PCA
+import plotly.express as px
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE])
 
@@ -20,10 +22,10 @@ app.layout = html.Div(className="app-container", children=[
              children='By Nathan Kirk for CS150 | nkirk@westmont.edu'),
 
     dbc.Row([
-        dbc.Col(html.Div(id="left-column", className="m-2", children=[
+        dbc.Col(html.Div(id="left-column", children=[
             drc.Card(id="first-card", children=[
-                html.H4(id="description-title", className="m-2", children="Description"),
-                html.P(id="description-text", className="m-2",
+                html.H4(id="description-title", children="Description"),
+                html.P(id="description-text",
                        children="This model tries to predict if a person will get approved for a"
                                 "credit card by looking at factors such as age, income, employment"
                                 "and many others. Try playing around with the factors below and see"
@@ -34,15 +36,17 @@ app.layout = html.Div(className="app-container", children=[
                                 "of function the model should use to separate the data."),
                 drc.NamedSlider("Test Percentage", id="test_size_slider", min=0.1, max=0.9, step=0.1, value=0.4),
                 drc.NamedSlider("Regulation Parameter", id="c_param_slider", min=0.1, max=1, step=0.1, value=1),
-                drc.NamedDropdown("Function Type (Kernel)", id="kernel_dropdown", options=['linear', 'poly', 'sigmoid'],
+                drc.NamedDropdown("Function Type (Kernel)", id="kernel_dropdown",
+                                  options=['linear', 'poly', 'sigmoid', 'rbf'],
                                   value="poly"),
                 dbc.Button("Reset Settings", id="reset_button", n_clicks=0, className="m-2"),
             ])
         ]), width=6, align="center"),
 
-        dbc.Col(html.Div(className="m-2", id="right-column", children=[
+        dbc.Col(html.Div(id="right-column", children=[
             drc.Card(id="second-card", children=[
                 dcc.Graph(id="model_graph", figure={}),
+                dcc.Graph(id="roc_graph", figure={}),
                 html.Hr(),
                 html.Div(id="confusion_matrix")
             ])
@@ -52,6 +56,7 @@ app.layout = html.Div(className="app-container", children=[
 
 
 @app.callback(Output("model_graph", "figure"),
+              Output("roc_graph", "figure"),
               Output("confusion_matrix", "children"),
               Input("test_size_slider", "value"),
               Input("c_param_slider", "value"),
@@ -73,6 +78,7 @@ def update_model_graph(test_size, c_param, kernel_dropdown):
             style_cell={'textAlign': 'center'}
         )
     ])
+    fig1={}
 
     decision_test = model.decision_function(X_test)
     fpr, tpr, threshold = metrics.roc_curve(y_test, decision_test)
@@ -99,9 +105,9 @@ def update_model_graph(test_size, c_param, kernel_dropdown):
     )
 
     data = [trace0]
-    fig = go.Figure(data=data, layout=layout)
+    fig2 = go.Figure(data=data, layout=layout)
 
-    return fig, table
+    return fig1, fig2, table
 
 
 @app.callback(
