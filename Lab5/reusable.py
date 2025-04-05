@@ -1,6 +1,8 @@
+"""
+Credit: Taken from dash-svm example app.
+"""
 from textwrap import dedent
 from dash import dcc, html
-
 
 # Display utility functions
 def _merge(a, b):

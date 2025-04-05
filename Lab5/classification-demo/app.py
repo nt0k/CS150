@@ -4,15 +4,11 @@ import scipy
 from dash import *
 import plotly.graph_objs as go
 import pandas as pd
-from Lab5 import *
+from Lab5 import ingestion
 from Lab5 import reusable as drc
-from Lab5 import figures as figgy
 from Lab5 import utilities
-import plotly.figure_factory as ff
 import dash_bootstrap_components as dbc
 from sklearn import metrics
-from sklearn.decomposition import PCA
-import plotly.express as px
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE])
 
@@ -34,8 +30,10 @@ app.layout = html.Div(className="app-container", children=[
                                 " parameter controls the trade-off between the model's complexity and its ability "
                                 "to classify training data correctly. And the function type determines what type "
                                 "of function the model should use to separate the data."),
-                drc.NamedSlider("Test Percentage", id="test_size_slider", min=0.1, max=0.9, step=0.1, value=0.2),
-                drc.NamedSlider("Regulation Parameter", id="c_param_slider", min=0.1, max=1, step=0.1, value=1),
+                drc.NamedSlider("Test Percentage (Training percentage is 1 - this value)", id="test_size_slider",
+                                min=0.1, max=0.9, step=0.1, value=0.5),
+                drc.NamedSlider("Regulation Parameter (Normalization)", id="c_param_slider", min=0.1, max=1, step=0.1,
+                                value=1),
                 drc.NamedDropdown("Function Type (Kernel)", id="kernel_dropdown",
                                   options=['linear', 'poly', 'sigmoid', 'rbf'],
                                   value="rbf"),
@@ -63,11 +61,14 @@ app.layout = html.Div(className="app-container", children=[
               Input("kernel_dropdown", "value"),
               )
 def update_model_graph(test_size, c_param, kernel_dropdown):
-    df = utilities.pull_and_clean_data()
+    df = ingestion.pull_and_clean_data()
     accuracy, TP, FP, TN, FN, model, X_test, y_test = utilities.classify_svm(df, test_size, c_param, kernel_dropdown)
 
+    # --- Create Confusion Matrix Table ---
     table = html.Div([
         html.H4("Confusion Matrix", style={"textAlign": "center"}),
+        html.P(id="confusion_matrix_subtext", children="Negative means accepted, positive means rejected",
+               style={'textAlign': 'center'}),
         dash_table.DataTable(
             columns=[{"name": "", "id": "index"}, {"name": "Predicted Negative", "id": "neg"},
                      {"name": "Predicted Positive", "id": "pos"}],
@@ -79,7 +80,7 @@ def update_model_graph(test_size, c_param, kernel_dropdown):
         )
     ])
 
-    # --- Create Scatter Plot Visualization for Classifier ---
+    # --- Create Scatter Plot Visualization ---
     X_test_df = pd.DataFrame(X_test, columns=df.drop(columns=["label"]).columns).reset_index(drop=True)
 
     feature1 = "Annual_income"
@@ -91,7 +92,6 @@ def update_model_graph(test_size, c_param, kernel_dropdown):
     # Identify correct and incorrect predictions
     correct_idx = np.where(y_pred == y_test)[0]
     incorrect_idx = np.where(y_pred != y_test)[0]
-
 
     trace_correct = go.Scatter(
         x=X_test_df.loc[correct_idx, feature1],
@@ -111,12 +111,13 @@ def update_model_graph(test_size, c_param, kernel_dropdown):
 
     fig1 = go.Figure(data=[trace_correct, trace_incorrect])
     fig1.update_layout(
-        title="Classifier Visualization",
+        title="Two Main Features Visualized",
         xaxis_title=feature1,
         yaxis_title=feature2,
         margin=dict(l=50, r=50, t=50, b=50)
     )
 
+    # --- Create ROC Curve Visualization ---
     decision_test = model.decision_function(X_test)
     fpr, tpr, threshold = metrics.roc_curve(y_test, decision_test)
 
@@ -154,7 +155,7 @@ def update_model_graph(test_size, c_param, kernel_dropdown):
     Input("reset_button", "n_clicks"),
 )
 def reset(clicks):
-    return 0.2, 1, "rbf"
+    return 0.5, 1, "rbf"
 
 
 if __name__ == '__main__':
