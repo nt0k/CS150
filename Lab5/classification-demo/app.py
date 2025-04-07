@@ -26,18 +26,22 @@ app.layout = html.Div(className="app-container", children=[
                                 "credit card by looking at factors such as age, income, employment"
                                 "and many others. Try playing around with the factors below and see"
                                 "how it impacts the confusion matrix and ROC curve! The test percentage"
-                                " controls how much of the data is used for training the model. The regulation"
-                                " parameter controls the trade-off between the model's complexity and its ability "
-                                "to classify training data correctly. And the function type determines what type "
-                                "of function the model should use to separate the data."),
+                                " controls how much of the data is used for training the model. The normalization parameter"
+                                "doesn't impact the mode much, but slight changes can be seen on the ROC curve."
+                                "The function type determines what type "
+                                "of function the model should use to separate the data. For the polynomial option, it is "
+                                "a polynomial of degree 3. "),
                 drc.NamedSlider("Test Percentage (Training percentage is 1 - this value)", id="test_size_slider",
                                 min=0.1, max=0.9, step=0.1, value=0.5),
-                drc.NamedSlider("Regulation Parameter (Normalization)", id="c_param_slider", min=0.1, max=1, step=0.1,
+                drc.NamedSlider("Normalization Parameter",
+                                id="c_param_slider", min=0.1, max=1, step=0.1,
                                 value=1),
-                drc.NamedDropdown("Function Type (Kernel)", id="kernel_dropdown",
+                drc.NamedDropdown("Function Type", id="kernel_dropdown",
                                   options=['linear', 'poly', 'sigmoid', 'rbf'],
                                   value="rbf"),
                 dbc.Button("Reset Settings", id="reset_button", n_clicks=0, className="m-2"),
+                html.Hr(),
+                html.Div(id="confusion_matrix")
             ])
         ]), width=6),
 
@@ -45,8 +49,6 @@ app.layout = html.Div(className="app-container", children=[
             drc.Card(id="second-card", children=[
                 dcc.Graph(id="model_graph", figure={}),
                 dcc.Graph(id="roc_graph", figure={}),
-                html.Hr(),
-                html.Div(id="confusion_matrix")
             ])
         ]), width=6),
     ])
@@ -66,7 +68,7 @@ def update_model_graph(test_size, c_param, kernel_dropdown):
 
     # --- Create Confusion Matrix Table ---
     table = html.Div([
-        html.H4("Confusion Matrix", style={"textAlign": "center"}),
+        html.H5("Confusion Matrix", style={"textAlign": "center"}),
         html.P(id="confusion_matrix_subtext", children="Negative means accepted, positive means rejected",
                style={'textAlign': 'center'}),
         dash_table.DataTable(
