@@ -7,10 +7,8 @@ from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import confusion_matrix
-from Lab5 import *
 
-
-def classify_svm(df, test_size=0.2, c_param=1.0, kernel='rbf'):
+def classify_svm(df, test_size=0.5, c_param=1.0, kernel='rbf'):
     """
     Classifies data using an SVM with configurable parameters.
 
@@ -33,6 +31,7 @@ def classify_svm(df, test_size=0.2, c_param=1.0, kernel='rbf'):
 
     # Most of this function was coded with help of ChatGPT
     # Prompt: Help me to build a classifier model for a dataset that has numerical and categorical data
+
     # Identify categorical and numerical columns in the dataset
     categorical_cols = X.select_dtypes(include=['object']).columns.tolist()
     numerical_cols = X.select_dtypes(exclude=['object']).columns.tolist()
