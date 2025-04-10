@@ -1,5 +1,4 @@
 import pandas as pd
-import pdfplumber
 
 
 def fetch_and_clean_data():
