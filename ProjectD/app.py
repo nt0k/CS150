@@ -37,18 +37,27 @@ app.layout = html.Div(className="app-container", children=[
 )
 def make_graph(fig):
     df = ingestion.fetch_and_clean_data()
-    line1 = go.Scatter(
+    # Clean up Encounter Count values and convert to integers
+    df["Encounter Count"] = df["Encounter Count"].astype(str).str.replace(",", "").astype(int)
+
+    # Create the line graph using Scatter
+    trace = go.Scatter(
         x=df["Date"],
         y=df["Encounter Count"],
-        name="Apprehensions at the Southern Border"
+        mode="lines",
+        name="Apprehensions at the Southern Border",
+        line=dict(color="#000000", width=3)
     )
 
     layout = go.Layout(
         title="Apprehensions at the Southern Border",
+        xaxis_title="Date",
+        yaxis_title="Encounter Count",
+        hovermode="closest",
+        plot_bgcolor="#E4E6EB",
     )
 
-    fig = go.Figure(line1, layout=layout)
-
+    fig = go.Figure(data=[trace], layout=layout)
     return fig
 
 

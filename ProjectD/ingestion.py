@@ -66,7 +66,8 @@ def fetch_and_clean_data():
     # Optionally, sort the dataframe by the new Date column for proper plotting.
     combined_df = combined_df.sort_values("Date")
 
-    print(combined_df)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.max_rows', 50)
     return combined_df
 
 
