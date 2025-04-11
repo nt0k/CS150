@@ -1,5 +1,5 @@
 import pandas as pd
-
+import pdfplumber
 
 def fetch_and_clean_data():
     # Get first data source
@@ -86,5 +86,16 @@ def get_date(row):
     # Create a date with the first day of the month.
     return pd.to_datetime(f"{year}-{m:02d}-01", format="%Y-%m-%d")
 
+def parsePdf():
+    data = []
+    with pdfplumber.open("data/US_BP_2000-2020.pdf") as pdf:
+        for page in pdf.pages:
+            tables = page.extract_tables()
+            for table in tables:
+                for row in table:
+                    if row and "Southwest Border" in row[0]:
+                        data.append(row)
 
-fetch_and_clean_data()
+    # Convert to DataFrame and clean
+    df = pd.DataFrame(data)
+    return df
