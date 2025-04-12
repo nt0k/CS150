@@ -4,8 +4,14 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 from ProjectD import ingestion
 from ProjectD import reusable as drc
+import plotly.express as px
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE])
+
+# Load pie data separately for specific case
+df_pie = pd.read_csv("data/fy21-25 encounters.csv")
+# Group and clean data
+df_pie["Encounter Count"] = df_pie["Encounter Count"].fillna(0).astype(int)
 
 app.layout = html.Div(className="app-container", children=[
     html.H1(style={"textAlign": "center"}, className="title mb-3 mt-2",
@@ -30,14 +36,41 @@ app.layout = html.Div(className="app-container", children=[
             drc.Card(id="second-card", children=[
                 dcc.Graph(id="first_graph", figure={}, style={"height": "550px", "width": "100%"}),
                 drc.NamedDropdown(name="Select Year Span", id="year_selection_dropdown", options=[
-                    "2015-2025", "2016-2020", "2012-2016", "2024-2025"], value="2015-2025")
+                    "2015-2023", "2016-2020", "2012-2016", "2024-2025"], value="2015-2023")
             ]),
         ]), width=6)
     ]),
+    dbc.Row([
+        dbc.Col(
+            drc.Card(id="third-card", children=[
+                html.Div([
+                    html.H3(id="description_title", children="Definitions Continued", className="m-2"),
+                    dcc.Markdown(
+                        id="description_text",
+                        className="m-2",
+                        children="""
+                    **Inadmissibles:** At ports of entry, the Office of Field Operations classifies individuals as inadmissible under Title 8 if they are denied legal entry into the United States due to reasons such as missing documents or prior violations.
+
+                    **Expulsions:** Invoked during the COVID-19 pandemic, Title 42 allowed for the rapid expulsion of migrants at the border on public health grounds, bypassing normal immigration processing and legal protections.
+                    """
+                    ),
+                    dcc.Graph(id="pie_chart"),
+                    dcc.Dropdown(
+                        id="year_selector",
+                        options=[{"label": str(year), "value": year} for year in
+                                 sorted(df_pie["Fiscal Year"].unique())],
+                        value=2025,
+                        clearable=False
+                    ),
+                ], style={"margin": "1rem"})
+            ]),
+            width=8
+        )
+    ], justify="center"),
     html.Footer("All data sourced from US Border Patrol", style={
         "textAlign": "center",
         "padding": "1rem",
-        "marginTop": "auto",
+        "marginTop": "12px",
         "fontSize": "0.9rem",
         "color": "#666"
     })
@@ -72,6 +105,17 @@ def make_graph(fig, year_selection):
         line=dict(color="red", dash="dash")
     )
 
+    base_style = {
+        "xref": "x",
+        "yref": "y",
+        "showarrow": True,
+        "arrowhead": 2,
+        "font": dict(size=12, color="black"),
+        "bgcolor": "white",
+        "bordercolor": "black",
+        "borderwidth": 1
+    }
+
     layout = go.Layout(
         title="Apprehensions at the Southern Border Return to Normal Levels",
         xaxis=dict(
@@ -100,23 +144,13 @@ def make_graph(fig, year_selection):
             yanchor="top"  # Anchor y at the top of the legend box
         ),
         annotations=[
-            dict(
-                x="2017-04-01",  # x position (a date or number depending on x-axis)
-                y=15000,  # y position
-                xref="x",
-                yref="y",
-                text="Similar level hit several times before"
-                     "<br>in Trump's and Biden's terms",
-                showarrow=True,
-                arrowhead=2,
-                ax=15,
-                ay=-220,
-                font=dict(size=12, color="black"),
-                bgcolor="white",
-                bordercolor="black",
-                borderwidth=1
-            )
-        ],
+            {**base_style, "x": "2017-04-01", "y": 15000,
+             "text": "Similar level hit several times before<br>in Trump's and Biden's terms", "ax": 15, "ay": -220},
+            {**base_style, "x": "2014-05-01", "y": 70000, "text": "Relatively stable amount during Obama's second term",
+             "ax": 0, "ay": -80},
+            {**base_style, "x": "2024-11-01", "y": 60000, "text": "Steady decline since Biden's policy enacted",
+             "ax": 0, "ay": -80},
+        ]
     )
 
     fig = go.Figure(data=[trace, additional_line], layout=layout)
@@ -213,6 +247,19 @@ def make_graph(fig):
     )
 
     fig = go.Figure(data=[trace, additional_line], layout=layout)
+    return fig
+
+
+@app.callback(
+    Output("pie_chart", "figure"),
+    Input("year_selector", "value")
+)
+def update_pie(selected_year):
+    filtered = df_pie[df_pie["Fiscal Year"] == selected_year]
+    grouped = filtered.groupby("Encounter Type")["Encounter Count"].sum().reset_index()
+
+    fig = px.pie(grouped, names="Encounter Type", values="Encounter Count",
+                 title=f"Encounter Type Breakdown – FY{selected_year}")
     return fig
 
 
