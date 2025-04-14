@@ -1,6 +1,7 @@
 import pandas as pd
 import pdfplumber
 
+
 def fetch_and_clean_data():
     # Get first data source
     df1 = pd.read_csv("data/fy21-25 encounters.csv")
@@ -62,7 +63,6 @@ def fetch_and_clean_data():
     # Apply the function to create the new Date column.
     combined_df["Date"] = combined_df.apply(get_date, axis=1)
 
-    # Optionally, sort the dataframe by the new Date column for proper plotting.
     combined_df = combined_df.sort_values("Date")
 
     pd.set_option('display.max_columns', None)
@@ -71,6 +71,8 @@ def fetch_and_clean_data():
 
 
 def get_date(row):
+    # Created with help from ChatGPT
+    # Prompt: Help me to adjust for FY data where the FY begins in Oct
     month_to_num = {
         "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4,
         "MAY": 5, "JUN": 6, "JUL": 7, "AUG": 8,
@@ -86,7 +88,10 @@ def get_date(row):
     # Create a date with the first day of the month.
     return pd.to_datetime(f"{year}-{m:02d}-01", format="%Y-%m-%d")
 
+
 def parsePdf():
+    # This was just used to help create BP_data_fy2000-2020 and then not used again
+    # I used this to scrape the pdf and then paste the data into the csv with excel
     data = []
     with pdfplumber.open("data/US_BP_2000-2020.pdf") as pdf:
         for page in pdf.pages:
@@ -95,7 +100,5 @@ def parsePdf():
                 for row in table:
                     if row and "Southwest Border" in row[0]:
                         data.append(row)
-
-    # Convert to DataFrame and clean
     df = pd.DataFrame(data)
     return df
