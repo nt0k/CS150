@@ -9,14 +9,14 @@ from ProjectD import reusable as drc
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE])
 
 app.layout = html.Div(className="app-container", children=[
-    html.H1(style={"textAlign": "center"}, className="title mb-3 mt-2", children='Apprehensions at the Souther Border'),
+    html.H1(style={"textAlign": "center"}, className="title mb-3 mt-2", children='Apprehensions at the Southern Border'),
     html.Div(style={"textAlign": "center"}, className="subtitle mb-3",
              children='By Nathan Kirk for CS150 | nkirk@westmont.edu'),
 
     dbc.Row([
         dbc.Col(html.Div(id="left-column", children=[
             drc.Card(id="first-card", children=[
-                html.H3(id="description_title", children="Description", className="m-2"),
+                html.H3(id="description_title", children="Definitions", className="m-2"),
                 html.P(id="description_text", className="m-2",
                        children="Title 8 of the U.S. Code governs immigration and nationality laws. When U.S. Border "
                                 "Patrol (USBP) reports an “Apprehension” under Title 8, it means that someone was "
