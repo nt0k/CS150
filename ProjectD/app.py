@@ -44,9 +44,9 @@ app.layout = html.Div(className="app-container", children=[
         dbc.Col(
             drc.Card(id="third-card", children=[
                 html.Div([
-                    html.H3(id="description_title", children="Definitions Continued", className="m-2"),
+                    html.H3(id="description_title2", children="Definitions Continued", className="m-2"),
                     dcc.Markdown(
-                        id="description_text",
+                        id="description_text2",
                         className="m-2",
                         children="""
                     **Inadmissibles:** At ports of entry, the Office of Field Operations classifies individuals as inadmissible under Title 8 if they are denied legal entry into the United States due to reasons such as missing documents or prior violations.
