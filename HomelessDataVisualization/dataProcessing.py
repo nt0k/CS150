@@ -75,7 +75,7 @@ def combine_data(data):
 
     return pd.concat(df_list, ignore_index=True)  # Merge all DataFrames
 
-
+'''
 HIC_data = grab_HIC_Data()
 HIC_combined = combine_data(HIC_data)
 pd.set_option('display.max_columns', None)
@@ -85,4 +85,6 @@ PIT_data = grab_PIT_Data()
 PIT_combined = combine_data(PIT_data)
 print(PIT_combined.head())
 save_data(PIT_combined, "PIT_data.pkl")
+'''
+
 
