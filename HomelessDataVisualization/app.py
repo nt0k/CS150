@@ -69,7 +69,7 @@ app.layout = html.Div(className="app-container", children=[
                                                "Total Year-Round Beds (PSH)": "Permanent Supportive Housing",
                                                "Total Year-Round Beds (RRH)": "Year Round Rapid Rehousing",
                                                "Total Year-Round Beds (ES, TH, SH)": "Emergency Shelter, Transitional, Safe Haven Beds"},
-                                      value="Emergency Shelter, Transitional, Safe Haven Beds")
+                                      value="Total Year-Round Beds (ES, TH, SH)")
                 ]
             ),
 

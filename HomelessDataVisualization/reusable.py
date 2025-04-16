@@ -38,10 +38,10 @@ def NamedSlider(name, **kwargs):
 
 def NamedDropdown(name, **kwargs):
     return html.Div(
-        style={"padding": "20px 10px 25px 4px"},
+        style={"padding": "10px 10px 10px 4px"},
         children=[
-            html.P(children=f"{name}:", style={"margin-left": "3px"}),
-            dcc.Dropdown(**kwargs, style={"width": "50%"}),
+            html.P(children=f"{name}:", style={"margin": "1px", "textAlign": "center"}),
+            dcc.Dropdown(**kwargs, style={"width": "80%", "margin": "0 auto"}),
         ],
     )
 
