@@ -11,40 +11,77 @@ import figures
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE])
 
 app.layout = html.Div(className="app-container", children=[
-    html.H1(style={"textAlign": "center"}, className="title mb-3 mt-2",
-            children='A Homeless Policy Case Study: NY vs LA'),
-    html.Div(style={"textAlign": "center"}, className="subtitle mb-3",
-             children='By Nathan Kirk for CS150 | nkirk@westmont.edu'),
+    html.H1(
+        children='A Homeless Policy Case Study: NY vs LA',
+        style={"textAlign": "center"},
+        className="title mb-3 mt-2"
+    ),
+
+    html.Div(
+        children='By Nathan Kirk for CS150 | nkirk@westmont.edu',
+        style={"textAlign": "center"},
+        className="subtitle mb-3"
+    ),
 
     dbc.Row([
-        dbc.Col(
-            drc.Card(id="main card", children=[
-                html.H4(id= "section_title1", className="m-2", children="A Complicated Issue"),
-                html.P(id="text1", className="m-2", children="The issue of homelessness is one that plague's our nation and our"
-                                            "state of California more severely. Billions of dollars are spent every year"
-                                            "to try to help people get off the streets, but despite the actions of so many"
-                                            "advocates and so much funding, the problem has gotten worse here despite"
-                                            "improving overall in the nation. First lets look at the overall situation in"
-                                            "two of the largest homeless populations centers in the US: LA and NY County."),
-                dcc.Graph(id="comparison_graph1", figure=figures.comparison_visual1())
-            ]
-                     ), width=10
-        )
+        dbc.Col([
+            html.H4("A Complicated Issue", id="section_title1", className="m-2"),
+
+            html.P(
+                id="text1",
+                className="m-2",
+                children=(
+                    "The issue of homelessness is one that plagues our nation and our "
+                    "state of California more severely. Billions of dollars are spent every year "
+                    "to try to help people get off the streets, but despite the actions of so many "
+                    "advocates and so much funding, the problem has gotten worse here. "
+                    "First let's look at the overall situation in "
+                    "two of the largest homeless population centers in the US: LA and NY County."
+                )
+            ),
+
+            drc.Card(
+                id="main card",
+                children=[
+                    dcc.Graph(id="comparison_graph1", figure=figures.comparison_visual1()),
+                    html.P(id="intergraph_text1", className="m-2",
+                           children="The dip in 2021 is due to a lack of reporting during the "
+                                    "pandemic. LA County increased 112% compared to NY City County "
+                                    "increase of 107% per capita in 2024 compared to "
+                                    "2014."),
+                    dcc.Graph(id="usa_capita_graph", figure=figures.us_percapita_homeless()),
+                ]
+            ),
+            html.P(
+                id="text2",
+                className="m-2",
+                children=(
+                    "The issue of homelessness has gotten significantly worse, but NY and LA have worsened more than four"
+                    "times more than the overall nation. "
+                )
+            ),
+            drc.Card(
+                id="graphs2",
+                children=[
+                    dcc.Graph(id="shelter_comparison_graph", figure=figures.shelter_comparison("Total Year-Round Beds (ES, TH, SH)")),
+                    drc.NamedDropdown(id="housing_segment_select", name="Select Housing Segment",
+                                      options={"Total Year-Round Beds (OPH)": "Other Permanent Housing",
+                                               "Total Year-Round Beds (PSH)": "Permanent Supportive Housing",
+                                               "Total Year-Round Beds (RRH)": "Year Round Rapid Rehousing",
+                                               "Total Year-Round Beds (ES, TH, SH)": "Emergency Shelter, Transitional, Safe Haven Beds"},
+                                      value="Emergency Shelter, Transitional, Safe Haven Beds")
+                ]
+            ),
+
+        ], width=8)
     ], justify="center"),
-    dbc.Row([
-        dbc.Col(html.Div(id="left-column", children=[
-            drc.Card(id="first-card", children=[
-                dcc.Graph(id="ca_graph", figure=figures.ca_visual_1()),
-            ])
-        ]), width=6),
-
-        dbc.Col(html.Div(id="right-column", children=[
-            drc.Card(id="second-card", children=[
-                dcc.Graph(id="ny_graph", figure=figures.ny_visual_1()),
-            ])
-        ]), width=6),
-    ]),
 ])
+
+@app.callback(Output("shelter_comparison_graph", "figure"),
+             Input("housing_segment_select", "value"))
+def update_segment_graph(segment):
+    return figures.shelter_comparison(segment)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
