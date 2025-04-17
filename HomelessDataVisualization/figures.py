@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.graph_objs as go
+from matplotlib.typing import RGBColorType
 
 from HomelessDataVisualization import reusable
 
@@ -42,6 +43,8 @@ def comparison_visual1(df=PIT_data):
         y=df_ca["Per Capita Homeless"],
         mode="lines+markers",
         name="LA County Per Capita Homeless",
+        line=dict(color="rgb(232,183,78)"),
+        marker=dict(color="rgb(232,183,78)")
     ))
 
     fig.add_trace(go.Scatter(
@@ -49,7 +52,20 @@ def comparison_visual1(df=PIT_data):
         y=df_ny["Per Capita Homeless"],
         mode="lines+markers",
         name="NY County Per Capita Homeless",
+        line=dict(color="rgb(32,72,88)"),
+        marker=dict(color="rgb(32,72,88)")
     ))
+
+    base_style = {
+        "xref": "x",
+        "yref": "y",
+        "showarrow": True,
+        "arrowhead": 2,
+        "font": dict(size=12, color="black"),
+        "bgcolor": "white",
+        "bordercolor": "lightgray",
+        "borderwidth": 0.5
+    }
 
     # Update the layout with a title and axis labels
     fig.update_layout(
@@ -79,6 +95,10 @@ def comparison_visual1(df=PIT_data):
             xanchor="center",  # Anchor x at the center of the legend
             yanchor="top"  # Anchor y at the top of the legend box
         ),
+        annotations=[
+            {**base_style, "x": "2021", "y": 190,
+             "text": "Drop due to decrease in reporting during Pandemic", "ax": -10, "ay": -150},
+        ]
     )
 
     return fig
@@ -102,7 +122,9 @@ def us_percapita_homeless():
         y=df_slope["Per Capita Homeless"],
         mode="lines+markers+text",
         name="US Per Capita Homeless",
-        textposition="top center"
+        textposition="top center",
+        line=dict(color="black"),
+        marker=dict(color="black")
     ))
 
     base_style = {
@@ -176,7 +198,9 @@ def shelter_comparison(segment):
         x=df_ca["Year"],
         y=df_ca[segment],
         mode="lines+markers",
-        name=f"LA {segment}"
+        name=f"LA {segment}",
+        line=dict(color="rgb(232,183,78)"),
+        marker=dict(color="rgb(232,183,78)")
     ))
 
     # Add a line trace for Total Year-Round Beds (RRH)
@@ -184,7 +208,9 @@ def shelter_comparison(segment):
         x=df_ny["Year"],
         y=df_ny[segment],
         mode="lines+markers",
-        name=f"NY {segment}"
+        name=f"NY {segment}",
+        line=dict(color="rgb(32,72,88)"),
+        marker=dict(color="rgb(32,72,88)")
     ))
 
     # Update the layout with a title and axis labels
@@ -203,3 +229,73 @@ def shelter_comparison(segment):
     )
 
     return fig
+
+def stack_bargraph1():
+    fig = go.Figure()
+    df = PIT_data
+
+    # Filter for CA-600 data
+    df_ca = df[df["CoC Number"] == "CA-600"].copy()
+    # Convert 'Year' to integer (if not already) and sort by Year
+    df_ca["Year"] = df_ca["Year"].astype(int)
+    df_ca.sort_values("Year", inplace=True)
+
+    # Filter for NY-600 data
+    df_ny = df[df["CoC Number"] == "NY-600"].copy()
+    # Convert 'Year' to integer (if not already) and sort by Year
+    df_ny["Year"] = df_ny["Year"].astype(int)
+    df_ny.sort_values("Year", inplace=True)
+    df_ca = df_ca[df_ca["Year"] == 2024]
+    df_ny = df_ny[df_ny["Year"] == 2024]
+
+    # Calculate Unsheltered Homeless
+    df_ca["Unsheltered Homeless"] = df_ca["Overall Homeless"] - df_ca["Sheltered Total Homeless"]
+    df_ny["Unsheltered Homeless"] = df_ny["Overall Homeless"] - df_ny["Sheltered Total Homeless"]
+
+
+    # Add LA and NY data to grouped stacked bar chart with composite x-axis
+    fig.add_trace(go.Bar(
+        x=["2024 LA"],
+        y=df_ca["Sheltered Total Homeless"],
+        name="LA Sheltered",
+        marker_color="rgb(232,183,78)"
+    ))
+
+    fig.add_trace(go.Bar(
+        x=["2024 LA"],
+        y=df_ca["Unsheltered Homeless"],
+        name="LA Unsheltered",
+        marker_color="rgb(255,221,157)"
+    ))
+
+    fig.add_trace(go.Bar(
+        x=["2024 NY"],
+        y=df_ny["Sheltered Total Homeless"],
+        name="NY Sheltered",
+        marker_color="rgb(32,72,88)",
+    ))
+
+    fig.add_trace(go.Bar(
+        x=["2024 NY"],
+        y=df_ny["Unsheltered Homeless"],
+        name="NY Unsheltered",
+        marker_color="rgb(169,194,206)"
+    ))
+
+    # Update layout
+    fig.update_layout(
+        barmode='stack',
+        title="Sheltered vs Unsheltered Homeless: LA vs NY",
+        xaxis_title="Year",
+        yaxis_title="Number of Homeless Individuals",
+        template="plotly_white",
+        legend=dict(
+            orientation="h",
+            x=0.5,
+            y=-0.2,
+            xanchor="center",
+            yanchor="top"
+        )
+    )
+    return fig
+
