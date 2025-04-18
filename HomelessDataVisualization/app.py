@@ -46,20 +46,21 @@ app.layout = html.Div(className="app-container", children=[
                 children=[
                     dcc.Graph(id="comparison_graph1", figure=figures.comparison_visual1()),
                     html.P(id="intergraph_text1", className="m-2",
-                           children="LA County increased 112% compared to NY City County "
-                                    "increase of 107% per capita in 2024 compared to "
-                                    "2014."),
+                           children="The last two years saw dramatic increases in the homeless population for NY "
+                                    "City County whereas LA County has had consistent growth over the last decade. "
+                                    "LA County increased 112% and NY City County "
+                                    "increase 107% per capita from 2014 to 2024."),
                     dcc.Graph(id="usa_capita_graph", figure=figures.us_percapita_homeless()),
+                    html.P(
+                        id="text2",
+                        className="m-2",
+                        children=(
+                            "The issue of homelessness has gotten significantly worse, but NY city county and LA county have "
+                            "worsened four "
+                            "times more than the overall nation. "
+                        )
+                    )
                 ]
-            ),
-            html.P(
-                id="text2",
-                className="m-2",
-                children=(
-                    "The issue of homelessness has gotten significantly worse, but NY city county and LA county have "
-                    "worsened four "
-                    "times more than the overall nation. "
-                )
             ),
             drc.Card(
                 id="graphs2",
