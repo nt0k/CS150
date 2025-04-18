@@ -74,7 +74,16 @@ app.layout = html.Div(className="app-container", children=[
                                                "Total Year-Round Beds (ES, TH, SH)": "Emergency Shelter, Transitional, Safe Haven Beds"},
                                       value="Total Year-Round Beds (ES, TH, SH)"),
                     html.Hr(),
-                    dcc.Graph(id="stacked_bar1", figure=figures.stack_bargraph1())
+                    dcc.Graph(id="stacked_bar1", figure=figures.stack_bargraph1()),
+                    html.P(
+                        id="text2",
+                        className="m-2",
+                        children=(
+                            "NY County has twice as many homeless people as LA County, yet it is still "
+                            "able to shelter nearly all of them. LA shelters only a third of its homeless "
+                            "population. "
+                        )
+                    )
                 ]
             ),
 
