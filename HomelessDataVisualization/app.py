@@ -67,7 +67,7 @@ app.layout = html.Div(className="app-container", children=[
                 children=[
                     dcc.Graph(id="shelter_comparison_graph",
                               figure=figures.shelter_comparison("Total Year-Round Beds (ES, TH, SH)")),
-                    drc.NamedDropdown(id="housing_segment_select", name="Select Housing Segment",
+                    drc.NamedDropdown(id="housing_segment_select", name="Select Shelter Segment",
                                       options={"Total Year-Round Beds (OPH)": "Other Permanent Housing",
                                                "Total Year-Round Beds (PSH)": "Permanent Supportive Housing",
                                                "Total Year-Round Beds (RRH)": "Year Round Rapid Rehousing",
@@ -76,7 +76,7 @@ app.layout = html.Div(className="app-container", children=[
                     html.Hr(),
                     dcc.Graph(id="stacked_bar1", figure=figures.stack_bargraph1()),
                     html.P(
-                        id="text2",
+                        id="text3",
                         className="m-2",
                         children=(
                             "NY County has twice as many homeless people as LA County, yet it is still "
@@ -86,7 +86,19 @@ app.layout = html.Div(className="app-container", children=[
                     )
                 ]
             ),
-
+            html.H4("Signifiant Impacts of Shelters", id="section_title2", className="m-2"),
+            html.P(
+                id="text4",
+                className="m-2",
+                children=(
+                    "Blah Blah Blah."
+                )
+            ),
+            drc.Card(
+                id="graphs3",
+                children=[
+                    dcc.Graph(figure=figures.death_graph())
+                ]),
         ], width=8)
     ], justify="center"),
 ])

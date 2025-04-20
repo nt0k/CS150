@@ -10,6 +10,7 @@ PIT_data = reusable.load_pickle_data("PIT_Data.pkl")
 
 pd.set_option('display.max_columns', None)
 
+
 def add_scatter(fig, df, x_col, y_col, name, color, width=4, textposition=None):
     mode = "lines+markers" + ("+text" if textposition else "")
     trace_args = {
@@ -25,6 +26,7 @@ def add_scatter(fig, df, x_col, y_col, name, color, width=4, textposition=None):
         trace_args["textposition"] = textposition
     fig.add_trace(go.Scatter(**trace_args))
 
+
 def add_bar(fig, x_vals, y_vals, name, color):
     fig.add_trace(go.Bar(
         x=x_vals,
@@ -33,6 +35,7 @@ def add_bar(fig, x_vals, y_vals, name, color):
         name=name,
         marker_color=color
     ))
+
 
 def comparison_visual1(df=PIT_data):
     fig = go.Figure()
@@ -125,7 +128,8 @@ def us_percapita_homeless():
     df_slope = df_us_pop[df_us_pop["Year"].isin([df_us_pop["Year"].min(), df_us_pop["Year"].max()])]
 
     # Add slope line
-    add_scatter(fig, df_slope, "Year", "Per Capita Homeless", "US Per Capita Homeless", "black", width=4, textposition="top center")
+    add_scatter(fig, df_slope, "Year", "Per Capita Homeless", "US Per Capita Homeless", "black", width=4,
+                textposition="top center")
 
     base_style = {
         "xref": "x",
@@ -202,8 +206,8 @@ def shelter_comparison(segment):
     # Create a figure for a line chart
     fig = go.Figure()
 
-    add_scatter(fig, df_ca, "Year", f"{segment} Per Capita", f"LA {segment} per 100k", "rgb(232,183,78)", width=4)
-    add_scatter(fig, df_ny, "Year", f"{segment} Per Capita", f"NY {segment} per 100k", "rgb(32,72,88)", width=4)
+    add_scatter(fig, df_ca, "Year", f"{segment} Per Capita", f"LA County", "rgb(232,183,78)", width=4)
+    add_scatter(fig, df_ny, "Year", f"{segment} Per Capita", f"NY City County", "rgb(32,72,88)", width=4)
 
     # Update the layout with a title and axis labels
     fig.update_layout(
@@ -229,6 +233,7 @@ def shelter_comparison(segment):
     )
 
     return fig
+
 
 def stack_bargraph1():
     fig = go.Figure()
@@ -264,6 +269,33 @@ def stack_bargraph1():
         title="NY City County Shelters 96% of its Homeless Population",
         xaxis_title="Year",
         yaxis_title="Number of Homeless Individuals",
+        template="plotly_white",
+        legend=dict(
+            orientation="h",
+            x=0.5,
+            y=-0.2,
+            xanchor="center",
+            yanchor="top",
+            traceorder="normal"
+        )
+    )
+    return fig
+
+
+def death_graph():
+    df_la = pd.read_excel("Data/LA_homeless_deaths.xlsx")
+    df_ny = pd.read_excel("Data/NY_homeless_deaths.xlsx")
+
+    fig = go.Figure()
+
+    add_bar(fig, df_la["Year"], df_la["Mortality Rate"], "LA County", "rgb(232,183,78)")
+    add_bar(fig, df_ny["Year"], df_ny["Mortality Rate"], "NY City County", "rgb(32,72,88)")
+
+    fig.update_layout(
+        #barmode='stack',
+        title="LA County's Death Rate is 3 times higher than New York's",
+        xaxis_title="Year",
+        yaxis_title="Deaths per 100,000 Homeless",
         template="plotly_white",
         legend=dict(
             orientation="h",
