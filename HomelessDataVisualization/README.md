@@ -29,4 +29,9 @@ metrics and explore the factors that contribute to this complex issue.
         * http://publichealth.lacounty.gov/chie/reports/Homeless_Mortality_Report_2024.pdf
     * LA Audit
         * https://ktla.com/news/los-angeles-is-spending-up-to-837000-to-house-a-single-homeless-person/
-    * 
+    * LA Population
+      * https://www.laalmanac.com/population/po04.php?utm_source=chatgpt.com
+    * NY Population
+      * https://www.nyc.gov/content/planning/pages/planning/population?utm_source=chatgpt.com
+    * NY Mortality Data
+      * https://a860-gpp.nyc.gov/concern/parent/td96k581k/file_sets/xd07gw71g
