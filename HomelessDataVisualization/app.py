@@ -12,7 +12,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE])
 
 app.layout = html.Div(className="app-container", children=[
     html.H1(
-        children='A Homeless Policy Case Study: NY vs LA',
+        children='A Tale of Two Cities; NY and LA',
         style={"textAlign": "center"},
         className="title mb-3 mt-2"
     ),
@@ -26,8 +26,7 @@ app.layout = html.Div(className="app-container", children=[
     dbc.Row([
         dbc.Col([
             html.Img(src="/assets/cover_image.jpg", style={"width": "100%", "margin-bottom": "10px"}),
-            html.H4("A Complicated Issue", id="section_title1", className="m-2"),
-
+            html.H4("Background", id="section_title1", className="m-2"),
             html.P(
                 id="text1",
                 className="m-2",
@@ -47,8 +46,8 @@ app.layout = html.Div(className="app-container", children=[
                     dcc.Graph(id="comparison_graph1", figure=figures.comparison_visual1()),
                     html.P(id="intergraph_text1", className="m-2",
                            children="The last two years saw dramatic increases in the homeless population for NY "
-                                    "City County whereas LA County has had consistent growth over the last decade. "
-                                    "LA County increased 112% and NY City County "
+                                    "City County due to a major influx of Asylum seekers. LA County has had consistent "
+                                    "increases over the last decade. LA County increased 112% and NY City County "
                                     "increase 107% per capita from 2014 to 2024."),
                     dcc.Graph(id="usa_capita_graph", figure=figures.us_percapita_homeless()),
                     html.P(
@@ -61,6 +60,22 @@ app.layout = html.Div(className="app-container", children=[
                         )
                     )
                 ]
+            ),
+            html.H4("Housing First Approach", id="section_title2", className="m-2"),
+            html.P(
+                id="text3",
+                className="m-2",
+                children=(
+                    "LA and NY both have a Housing First approach, which focuses on providing permanent housing without "
+                    "preconditions like sobriety or treatment. LA has been criticized for its inefficiency in building "
+                    "homes and shelters. A city ",
+                    html.A("audit",
+                           href="https://ktla.com/news/los-angeles-is-spending-up-to-837000-to-house-a-single-homeless-person/",
+                           target="_blank"),
+                    " in 2022 revealed that 14% of the units build exceeded $700,000 each."
+                    "In contrast, New York has a right to shelter legal mandate that requires the city to have shelters"
+                    "for all who need them."
+                )
             ),
             drc.Card(
                 id="graphs2",
@@ -75,29 +90,22 @@ app.layout = html.Div(className="app-container", children=[
                                       value="Total Year-Round Beds (ES, TH, SH)"),
                     html.Hr(),
                     dcc.Graph(id="stacked_bar1", figure=figures.stack_bargraph1()),
-                    html.P(
-                        id="text3",
-                        className="m-2",
-                        children=(
-                            "NY County has twice as many homeless people as LA County, yet it is still "
-                            "able to shelter nearly all of them. LA shelters only a third of its homeless "
-                            "population. "
-                        )
-                    )
                 ]
             ),
-            html.H4("Signifiant Impacts of Shelters", id="section_title2", className="m-2"),
-            html.P(
-                id="text4",
-                className="m-2",
-                children=(
-                    "Blah Blah Blah."
-                )
-            ),
+            html.H4("Significant Impact of Shelters", id="section_title3", className="m-2"),
             drc.Card(
                 id="graphs3",
                 children=[
-                    dcc.Graph(figure=figures.death_graph())
+                    dcc.Graph(figure=figures.death_graph()),
+                    html.P(
+                        id="text5",
+                        className="m-2",
+                        children=(
+                            "Having more shelters leads to several positive impacts including increased safety, better access to ",
+                            "basic necessities, and reduced strain on emergency services. The bottom line is, LA County needs to "
+                            "invest heavily in more shelters to get people off the street and into safer environments."
+                        )
+                    ),
                 ]),
         ], width=8)
     ], justify="center"),

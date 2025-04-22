@@ -5,3 +5,5 @@ First Visualization: housed vs unhoused NY vs CA
 Second: Death Rate comparison NY vs CA
 
 Third: Look into housing supply vs homeless increase in VA
+
+Source for audit: https://ktla.com/news/los-angeles-is-spending-up-to-837000-to-house-a-single-homeless-person/

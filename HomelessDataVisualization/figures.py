@@ -15,7 +15,7 @@ def add_scatter(fig, df, x_col, y_col, name, color, width=4, textposition=None):
     mode = "lines+markers" + ("+text" if textposition else "")
     trace_args = {
         "x": df[x_col],
-        "y": df[y_col],
+        "y": round(df[y_col],0), #Round the y values here
         "mode": mode,
         "hoverinfo": "x+y",
         "name": name,
@@ -30,7 +30,7 @@ def add_scatter(fig, df, x_col, y_col, name, color, width=4, textposition=None):
 def add_bar(fig, x_vals, y_vals, name, color):
     fig.add_trace(go.Bar(
         x=x_vals,
-        y=y_vals,
+        y=round(y_vals,0), #Round the y values here
         hoverinfo="x+y",
         name=name,
         marker_color=color
@@ -60,12 +60,12 @@ def comparison_visual1(df=PIT_data):
     # Merge with population data, suffixing overlapping 'Year' column from population df
     # Calculate per capita
     df_ca = df_ca.merge(df_la_pop, on="Year", suffixes=("", "_pop"))
-    df_ca["Per Capita Homeless"] = (df_ca["Overall Homeless"] / df_ca["Population"]) * 100000
+    df_ca["Per Capita Homeless"] = round((df_ca["Overall Homeless"] / df_ca["Population"]) * 100000,0)
     df_ny = df_ny.merge(df_ny_pop, on="Year", suffixes=("", "_pop"))
-    df_ny["Per Capita Homeless"] = (df_ny["Overall Homeless"] / df_ny["Population"]) * 100000
+    df_ny["Per Capita Homeless"] = round((df_ny["Overall Homeless"] / df_ny["Population"]) * 100000,0)
 
-    add_scatter(fig, df_ca, "Year", "Per Capita Homeless", "LA County Per Capita Homeless", "rgb(232,183,78)", width=4)
-    add_scatter(fig, df_ny, "Year", "Per Capita Homeless", "NY County Per Capita Homeless", "rgb(32,72,88)", width=4)
+    add_scatter(fig, df_ca, "Year", "Per Capita Homeless", "LA County", "rgb(232,183,78)", width=4)
+    add_scatter(fig, df_ny, "Year", "Per Capita Homeless", "NY County", "rgb(32,72,88)", width=4)
 
     base_style = {
         "xref": "x",
@@ -74,7 +74,7 @@ def comparison_visual1(df=PIT_data):
         "arrowhead": 2,
         "font": dict(size=12, color="black"),
         "bgcolor": "white",
-        "bordercolor": "lightgray",
+        "bordercolor": "white",
         "borderwidth": 0.5
     }
 
@@ -122,13 +122,10 @@ def us_percapita_homeless():
 
     # Merge and calculate per capita
     df_us_pop = df_us_pop.merge(df_us_homeless, on="Year", suffixes=("", "_pop"))
-    df_us_pop["Per Capita Homeless"] = (df_us_pop["Estimated Homeless Population"] / df_us_pop["Population"]) * 100000
-
-    # Get first and last year only
-    df_slope = df_us_pop[df_us_pop["Year"].isin([df_us_pop["Year"].min(), df_us_pop["Year"].max()])]
+    df_us_pop["Per Capita Homeless"] = round((df_us_pop["Estimated Homeless Population"] / df_us_pop["Population"]) * 100000,0)
 
     # Add slope line
-    add_scatter(fig, df_slope, "Year", "Per Capita Homeless", "US Per Capita Homeless", "black", width=4,
+    add_scatter(fig, df_us_pop, "Year", "Per Capita Homeless", "US Per Capita Homeless", "black", width=4,
                 textposition="top center")
 
     base_style = {
@@ -138,16 +135,16 @@ def us_percapita_homeless():
         "arrowhead": 2,
         "font": dict(size=12, color="black"),
         "bgcolor": "white",
-        "bordercolor": "gray",
+        "bordercolor": "white",
         "borderwidth": 0.5
     }
 
     fig.update_layout(
-        title="USA Homeless Population Per Capita",
+        title="Homelessness Increases 25% in the US Over Last Decade",
         template="plotly_white",
         xaxis=dict(
             title="Year",
-            tickvals=[2014, 2024],
+            #tickvals=[2014, 2024],
             showline=True,
             showgrid=False,
             linecolor="lightgray",
@@ -156,7 +153,7 @@ def us_percapita_homeless():
         ),
         yaxis=dict(
             title="Homeless per 100k People",
-            range=[0, df_slope["Per Capita Homeless"].max() * 1.25],
+            range=[0, round(df_us_pop["Per Capita Homeless"].max() * 1.25,0)],
             gridcolor="lightgray",
             showgrid=True,
             showline=True,
@@ -170,10 +167,6 @@ def us_percapita_homeless():
             xanchor="center",  # Anchor x at the center of the legend
             yanchor="top"  # Anchor y at the top of the legend box
         ),
-        annotations=[
-            {**base_style, "x": "2019", "y": 125,
-             "text": "25% increase over the last decade.", "ax": 0, "ay": 0},
-        ]
     )
 
     return fig
@@ -198,10 +191,10 @@ def shelter_comparison(segment):
     df_ny_pop = pd.read_excel("Data/NY_population.xlsx")
     # Merge population data and calculate per capita for chosen segment
     df_ca = df_ca.merge(df_la_pop, on="Year")
-    df_ca[f"{segment} Per Capita"] = (df_ca[segment] / df_ca["Population"]) * 100000
+    df_ca[f"{segment} Per Capita"] = round((df_ca[segment] / df_ca["Population"]) * 100000,0)
 
     df_ny = df_ny.merge(df_ny_pop, on="Year")
-    df_ny[f"{segment} Per Capita"] = (df_ny[segment] / df_ny["Population"]) * 100000
+    df_ny[f"{segment} Per Capita"] = round((df_ny[segment] / df_ny["Population"]) * 100000,0)
 
     # Create a figure for a line chart
     fig = go.Figure()
@@ -254,8 +247,8 @@ def stack_bargraph1():
     df_ny = df_ny[df_ny["Year"] == 2024]
 
     # Calculate Unsheltered Homeless
-    df_ca["Unsheltered Homeless"] = df_ca["Overall Homeless"] - df_ca["Sheltered Total Homeless"]
-    df_ny["Unsheltered Homeless"] = df_ny["Overall Homeless"] - df_ny["Sheltered Total Homeless"]
+    df_ca["Unsheltered Homeless"] = round(df_ca["Overall Homeless"] - df_ca["Sheltered Total Homeless"], 0)
+    df_ny["Unsheltered Homeless"] = round(df_ny["Overall Homeless"] - df_ny["Sheltered Total Homeless"], 0)
 
     # Add LA and NY data to grouped stacked bar chart with composite x-axis
     add_bar(fig, ["2024 LA"], df_ca["Sheltered Total Homeless"], "LA Sheltered", "rgb(232,183,78)")
@@ -288,13 +281,21 @@ def death_graph():
 
     fig = go.Figure()
 
-    add_bar(fig, df_la["Year"], df_la["Mortality Rate"], "LA County", "rgb(232,183,78)")
-    add_bar(fig, df_ny["Year"], df_ny["Mortality Rate"], "NY City County", "rgb(32,72,88)")
+    add_bar(fig, df_la["Year"], round(df_la["Mortality Rate"],0), "LA County", "rgb(232,183,78)")
+    add_bar(fig, df_ny["Year"], round(df_ny["Mortality Rate"],0), "NY City County", "rgb(32,72,88)")
 
     fig.update_layout(
         #barmode='stack',
         title="LA County's Death Rate is 3 times higher than New York's",
-        xaxis_title="Year",
+        xaxis=dict(
+            title="Year",
+            tickmode='linear',  # Ensure all values are shown
+            dtick=1,           # Set the interval between ticks to 1 year
+            showline=True,
+            showgrid=False,
+            linecolor="lightgray",
+            linewidth=1,
+        ),
         yaxis_title="Deaths per 100,000 Homeless",
         template="plotly_white",
         legend=dict(
