@@ -106,6 +106,19 @@ app.layout = html.Div(className="app-container", children=[
                             "invest heavily in more shelters to get people off the street and into safer environments."
                         )
                     ),
+                    dcc.Graph(id="mortality_projection"),
+                    html.P(id="disclaimer", style={"margin": 2, "fontSize": "12px", "color": "gray"},
+                           children="Note: This model assumes that the counties will behave similarly and is meant to be an estimate"),
+                    html.Div(id="output_metrics", style={"margin": 10, "fontSize": "17px", "textAlign": "center"}),
+                    drc.NamedSlider(
+                        id="shelter_rate_slider",
+                        name="Select Sheltered Percentage",
+                        min=40,
+                        max=100,
+                        step=1,
+                        marks={i: f'{i}%' for i in range(40, 101, 10)},
+                        value=40
+                    ),
                 ]),
         ], width=8)
     ], justify="center"),
@@ -116,6 +129,15 @@ app.layout = html.Div(className="app-container", children=[
               Input("housing_segment_select", "value"))
 def update_segment_graph(segment):
     return figures.shelter_comparison(segment)
+
+
+@app.callback(
+    [Output("output_metrics", "children"),
+     Output("mortality_projection", "figure")],
+    Input("shelter_rate_slider", "value")
+)
+def update_projection_graph(input_value):
+    return figures.projection_graph(input_value)
 
 
 if __name__ == '__main__':
