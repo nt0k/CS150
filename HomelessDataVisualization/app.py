@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
-import dash_bootstrap_components
 from dash import Dash, dcc, html, dash_table, Input, Output, State, callback_context, dash
 import dash_bootstrap_components as dbc
-import plotly.graph_objects as go
-import pandas as pd
-import plotly.express as px
 import reusable as drc
 import figures
 
@@ -12,7 +8,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE])
 
 app.layout = html.Div(className="app-container", children=[
     html.H1(
-        children='A Tale of Two Cities; NY and LA',
+        children='A Tale of Two Cities',
         style={"textAlign": "center"},
         className="title mb-3 mt-2"
     ),
@@ -49,6 +45,7 @@ app.layout = html.Div(className="app-container", children=[
                                     "City County due to a major influx of Asylum seekers. LA County has had consistent "
                                     "increases over the last decade. LA County increased 112% and NY City County "
                                     "increase 107% per capita from 2014 to 2024."),
+                    html.Hr(),
                     dcc.Graph(id="usa_capita_graph", figure=figures.us_percapita_homeless()),
                     html.P(
                         id="text2",
@@ -72,8 +69,8 @@ app.layout = html.Div(className="app-container", children=[
                     html.A("audit",
                            href="https://ktla.com/news/los-angeles-is-spending-up-to-837000-to-house-a-single-homeless-person/",
                            target="_blank"),
-                    " in 2022 revealed that 14% of the units build exceeded $700,000 each."
-                    "In contrast, New York has a right to shelter legal mandate that requires the city to have shelters"
+                    " in 2022 revealed that 14% of the units built exceeded $700,000 each."
+                    "In contrast, New York has a right to shelter legal mandate that requires the city to have shelters "
                     "for all who need them."
                 )
             ),
@@ -103,7 +100,9 @@ app.layout = html.Div(className="app-container", children=[
                         children=(
                             "Having more shelters leads to several positive impacts including increased safety, better access to ",
                             "basic necessities, and reduced strain on emergency services. The bottom line is, LA County needs to "
-                            "invest heavily in more shelters to get people off the street and into safer environments."
+                            "invest heavily in more shelters to get people off the street and into safer environments. Half of homeless "
+                            "deaths in LA are from drug overdose, traffic accidents, and murder. Getting people off the streets and "
+                            "mandating treatment will save many lives, as we have already seen in New York. "
                         )
                     ),
                     dcc.Graph(id="mortality_projection"),

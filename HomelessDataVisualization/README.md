@@ -8,11 +8,14 @@
 
 ---
 
+## Thesis
+LA should priotize and build more shelters to protect its homeless population.
+
 ## Overview
 
 This project provides a comprehensive look at the homelessness situation in Los Angeles County and New York City, two of
-the largest homeless population centers in the United States. It uses interactive data visualizations to compare key
-metrics and explore the factors that contribute to this complex issue.
+the largest homeless population centers in the United States. It focuses on differences in shelter availability and its
+impact on safety.
 
 ## Technical Details
 
