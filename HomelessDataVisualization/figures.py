@@ -251,9 +251,6 @@ def stack_bargraph1():
     df_ca["Unsheltered Homeless"] = round(df_ca["Overall Homeless"] - df_ca["Sheltered Total Homeless"], 0)
     df_ny["Unsheltered Homeless"] = round(df_ny["Overall Homeless"] - df_ny["Sheltered Total Homeless"], 0)
 
-    print(df_ca)
-    print(df_ny)
-
     # Add LA and NY data to grouped stacked bar chart with composite x-axis
     add_bar(fig, ["2024 LA"], df_ca["Sheltered Total Homeless"], "LA Sheltered", "rgb(232,183,78)")
     add_bar(fig, ["2024 LA"], df_ca["Unsheltered Homeless"], "LA Unsheltered", "rgb(255,221,157)")
@@ -333,8 +330,7 @@ def projection_graph(shelter_percent):
 
     text_output = (
         f"At a shelter rate of {shelter_percent}%, "
-        f"the projected mortality is {projected_mortality:.0f} per 100,000. "
-        f"Estimated lives saved: {estimated_lives_saved:.0f}"
+        f"an estimated {estimated_lives_saved:.0f} fewer people would die."
     )
 
     fig = go.Figure()

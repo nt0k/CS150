@@ -69,7 +69,7 @@ app.layout = html.Div(className="app-container", children=[
                     html.A("audit",
                            href="https://ktla.com/news/los-angeles-is-spending-up-to-837000-to-house-a-single-homeless-person/",
                            target="_blank"),
-                    " in 2022 revealed that 14% of the units built exceeded $700,000 each."
+                    " in 2022 revealed that 14% of the units built exceeded $700,000 each. "
                     "In contrast, New York has a right to shelter legal mandate that requires the city to have shelters "
                     "for all who need them."
                 )
@@ -90,21 +90,21 @@ app.layout = html.Div(className="app-container", children=[
                 ]
             ),
             html.H4("Significant Impact of Shelters", id="section_title3", className="m-2"),
+            html.P(
+                id="text5",
+                className="m-2",
+                children=(
+                    "Having more shelters leads to several positive impacts including increased safety, better access to ",
+                    "basic necessities, and reduced strain on emergency services. Half of homeless "
+                    "deaths in LA are from drug overdose, traffic accidents, and murder. These deaths can be mitigated in a "
+                    "sheltered environment."
+                )
+            ),
             drc.Card(
                 id="graphs3",
                 children=[
-                    dcc.Graph(figure=figures.death_graph()),
-                    html.P(
-                        id="text5",
-                        className="m-2",
-                        children=(
-                            "Having more shelters leads to several positive impacts including increased safety, better access to ",
-                            "basic necessities, and reduced strain on emergency services. The bottom line is, LA County needs to "
-                            "invest heavily in more shelters to get people off the street and into safer environments. Half of homeless "
-                            "deaths in LA are from drug overdose, traffic accidents, and murder. Getting people off the streets and "
-                            "mandating treatment will save many lives, as we have already seen in New York. "
-                        )
-                    ),
+                    dcc.Graph(id="death_graph", figure=figures.death_graph()),
+                    html.Hr(),
                     dcc.Graph(id="mortality_projection"),
                     html.P(id="disclaimer", style={"margin": 2, "fontSize": "12px", "color": "gray"},
                            children="Note: This model assumes that the counties will behave similarly and is meant to be an estimate"),
@@ -119,8 +119,45 @@ app.layout = html.Div(className="app-container", children=[
                         value=40
                     ),
                 ]),
+            html.P(
+                id="conclusionText",
+                className="m-2",
+                children=[
+                    "The bottom line is, LA County needs to invest heavily in more shelters to get people off the street "
+                    "and into safer environments. Getting people off the streets and mandating treatment will save many "
+                    "lives, as we have already seen in New York. Scan the QR Code below to let City Controller Kenneth Mejia "
+                    "know that you want more funding to be used to build more shelters. Or send an email manually to",
+                    html.Br(),
+                    html.Div(
+                        "controller.mejia@lacity.org",
+                        style={"fontWeight": "bold", "fontSize": "18px", "textAlign": "center"}
+                    )
+                ],
+            ),
+            html.Div(
+                children=html.Img(src="/assets/qrcode.png", style={"width": "70%", "marginBottom": "2px"}),
+                style={"display": "flex", "justifyContent": "center", "alignItems": "center"}
+            ),
         ], width=8)
     ], justify="center"),
+    html.Footer(
+        children=[
+            "© 2025 Nathan Kirk | Westmont College | ",
+            html.A(
+                "Sources",
+                href="https://github.com/nt0k/CS150/blob/main/HomelessDataVisualization/README.md",
+                target="_blank"
+            )
+        ],
+        style={
+            "textAlign": "center",
+            "padding": "20px",
+            "marginTop": "40px",
+            "fontSize": "14px",
+            "color": "#666",
+            "borderTop": "1px solid #ccc"
+        }
+    )
 ])
 
 
