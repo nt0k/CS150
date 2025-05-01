@@ -31,7 +31,7 @@ app.layout = html.Div(className="app-container", children=[
                     "state of California more severely. Billions of dollars are spent every year "
                     "to try to help people get off the streets, but despite the actions of so many "
                     "advocates and so much funding, the problem has gotten worse. "
-                    "First let's look at the overall situation in "
+                    "First, let's look at the overall situation in "
                     "two of the largest homeless population centers in the US: LA and NY City County."
                 )
             ),
@@ -40,24 +40,16 @@ app.layout = html.Div(className="app-container", children=[
                 id="main card",
                 children=[
                     dcc.Graph(id="comparison_graph1", figure=figures.comparison_visual1()),
-                    html.P(id="intergraph_text1", className="m-2",
-                           children="The last two years saw dramatic increases in the homeless population for NY "
-                                    "City County due to a major influx of Asylum seekers. LA County has had consistent "
-                                    "increases over the last decade. LA County increased 112% and NY City County "
-                                    "increase 107% per capita from 2014 to 2024."),
-                    html.Hr(),
-                    dcc.Graph(id="usa_capita_graph", figure=figures.us_percapita_homeless()),
-                    html.P(
-                        id="text2",
-                        className="m-2",
-                        children=(
-                            "The issue of homelessness has gotten significantly worse, but NY city county and LA county have "
-                            "worsened four "
-                            "times more than the overall nation. "
-                        )
-                    )
                 ]
             ),
+            html.P(id="intergraph_text1", className="m-2",
+                   children="2023 and 2024 saw dramatic increases in the homeless population for NY "
+                            "City County due to a major influx of Asylum seekers. LA County has had consistent "
+                            "increases over the last decade. In total, LA County increased 112% and NY City County "
+                            "increase 107% per capita from 2014 to 2024, whereas the U.S. as a whole increased "
+                            "25%. Homelessness has gotten significantly worse, but NY city county and LA county have worsened four "
+                            "times more than the overall nation. So what strategy have these two counties employed to care "
+                            "for their homeless populations?"),
             html.H4("Housing First Approach", id="section_title2", className="m-2"),
             html.P(
                 id="text3",
@@ -65,13 +57,14 @@ app.layout = html.Div(className="app-container", children=[
                 children=(
                     "LA and NY both have a Housing First approach, which focuses on providing permanent housing without "
                     "preconditions like sobriety or treatment. LA has been criticized for its inefficiency in building "
-                    "homes and shelters. A city ",
+                    "homes and shelters. A 2022 Los Angeles City Controller ",
                     html.A("audit",
                            href="https://ktla.com/news/los-angeles-is-spending-up-to-837000-to-house-a-single-homeless-person/",
                            target="_blank"),
-                    " in 2022 revealed that 14% of the units built exceeded $700,000 each. "
-                    "In contrast, New York has a right to shelter legal mandate that requires the city to have shelters "
-                    "for all who need them."
+                    " found that 14% of the planned supportive housing units were projected to cost more than $700,000 each, "
+                    "with some developments reaching as high as $837,000 per unit. "
+                    "In contrast, New York focuses more on providing temporary shelters. This is prioritized and legal enforced through "
+                    "its right to shelter legal mandate."
                 )
             ),
             drc.Card(
@@ -130,7 +123,7 @@ app.layout = html.Div(className="app-container", children=[
                     html.Br(),
                     html.Div(
                         "controller.mejia@lacity.org",
-                        style={"fontWeight": "bold", "fontSize": "18px", "textAlign": "center"}
+                        style={"fontWeight": "bold", "fontSize": "24px", "textAlign": "center"}
                     )
                 ],
             ),

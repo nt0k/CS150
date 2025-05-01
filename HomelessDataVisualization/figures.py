@@ -64,8 +64,17 @@ def comparison_visual1(df=PIT_data):
     df_ny = df_ny.merge(df_ny_pop, on="Year", suffixes=("", "_pop"))
     df_ny["Per Capita Homeless"] = round((df_ny["Overall Homeless"] / df_ny["Population"]) * 100000, 0)
 
-    add_scatter(fig, df_ca, "Year", "Per Capita Homeless", "LA County", "rgb(232,183,78)", width=4)
+    df_us_pop = pd.read_excel("Data/US_Population.xlsx")
+    df_us_homeless = pd.read_excel("Data/Nationwide_Homeless.xlsx")
+
+    # Merge and calculate per capita
+    df_us_pop = df_us_pop.merge(df_us_homeless, on="Year", suffixes=("", "_pop"))
+    df_us_pop["Per Capita Homeless"] = round(
+        (df_us_pop["Estimated Homeless Population"] / df_us_pop["Population"]) * 100000, 0)
     add_scatter(fig, df_ny, "Year", "Per Capita Homeless", "NY County", "rgb(32,72,88)", width=4)
+    add_scatter(fig, df_ca, "Year", "Per Capita Homeless", "LA County", "rgb(232,183,78)", width=4)
+    add_scatter(fig, df_us_pop, "Year", "Per Capita Homeless", "United States", "black", width=4,
+                textposition="top center")
 
     base_style = {
         "xref": "x",
@@ -80,7 +89,7 @@ def comparison_visual1(df=PIT_data):
 
     # Update the layout with a title and axis labels
     fig.update_layout(
-        title="LA and NY Both See a Doubling in Their Homeless Population",
+        title="LA and NY Outpace Nation in Homeless Population Growth",
         template="plotly_white",
         xaxis=dict(
             title="Year",
@@ -91,7 +100,7 @@ def comparison_visual1(df=PIT_data):
             dtick=1
         ),
         yaxis=dict(
-            title="Number of Homeless People Per 100k",
+            title="Homeless People Per Capita",
             range=[0, 2050],
             gridcolor="lightgray",
             showgrid=True,

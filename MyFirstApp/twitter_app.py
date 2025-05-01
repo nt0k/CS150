@@ -1,7 +1,8 @@
 import pandas as pd
 import plotly.express as px
 
-from dash import Dash, dcc, html, Input, Output
+from dash import Dash, dcc, html, Input, Output, State
+import dash_bootstrap_components as dbc
 
 # Preparing your data for usage *******************************************
 
@@ -20,20 +21,19 @@ df = df.reset_index()
 # App Layout **************************************************************
 
 stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
-app = Dash(__name__, external_stylesheets=stylesheets)
+app = Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE])
 
 app.layout = html.Div(
     [
-        html.Div(
+        dbc.Row(
             html.H1(
                 "Twitter Likes Analysis of Famous People", style={"textAlign": "center"}
             ),
-            className="row",
+            className="row p-2",
         ),
-        html.Div(dcc.Graph(id="line-chart", figure={}), className="row"),
-        html.Div(
+        dbc.Row(dcc.Graph(id="line-chart", figure={}), className="row"),
+        dbc.Row(
             [
-                html.Div(
                     dcc.Dropdown(
                         id="my-dropdown",
                         multi=True,
@@ -41,11 +41,10 @@ app.layout = html.Div(
                             {"label": x, "value": x}
                             for x in sorted(df["name"].unique())
                         ],
-                        value=["taylorswift13", "cristiano", "jtimberlake"],
+                        value=["taylorswift13", "cristiano", "jtimberlake"], className="m-5",
                     ),
-                    className="three columns",
-                ),
-                html.Div(
+                    dbc.Button("Reset", id="reset-button", color="danger", outline=True, disabled=False, n_clicks=0),
+                dbc.Row(
                     html.A(
                         id="my-link",
                         children="Click here to Visit Twitter",
@@ -64,7 +63,9 @@ app.layout = html.Div(
 # Callbacks ***************************************************************
 @app.callback(
     Output(component_id="line-chart", component_property="figure"),
+    Output(component_id="reset-button", component_property="disabled", allow_duplicate=True),
     [Input(component_id="my-dropdown", component_property="value")],
+    prevent_initial_call=True,
 )
 def update_graph(chosen_value):
     print(f"Values chosen by user: {chosen_value}")
@@ -85,7 +86,18 @@ def update_graph(chosen_value):
                 "name": "Celebrity",
             },
         )
-        return fig
+        return fig, False
+
+@app.callback(
+    Output(component_id="my-dropdown", component_property="value"),
+    Output(component_id="reset-button", component_property="disabled", allow_duplicate=True),
+    Input(component_id="reset-button", component_property="n_clicks"),
+    prevent_initial_call=True,
+)
+def reset(n_clicks):
+    if n_clicks > 0:
+        return "", True
+
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run(debug=True)
