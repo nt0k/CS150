@@ -352,7 +352,7 @@ def projection_graph(shelter_percent):
 
     fig.update_layout(
         xaxis_title="Scenario",
-        yaxis_title="Mortality Rate per 100,000 Homeless",
+        yaxis_title="Deaths per 100,000 Homeless",
         title="Building More Shelters Saves Hundreds of Lives",
         template="plotly_white",
         yaxis=dict(range=[0, 2500]),

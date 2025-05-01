@@ -73,11 +73,30 @@ app.layout = html.Div(className="app-container", children=[
                     dcc.Graph(id="shelter_comparison_graph",
                               figure=figures.shelter_comparison("Total Year-Round Beds (ES, TH, SH)")),
                     drc.NamedDropdown(id="housing_segment_select", name="Select Shelter Segment",
-                                      options={"Total Year-Round Beds (OPH)": "Other Permanent Housing",
-                                               "Total Year-Round Beds (PSH)": "Permanent Supportive Housing",
+                                      options={"Total Year-Round Beds (PSH)": "Permanent Supportive Housing",
+                                               "Total Year-Round Beds (OPH)": "Other Permanent Housing",
                                                "Total Year-Round Beds (RRH)": "Year Round Rapid Rehousing",
                                                "Total Year-Round Beds (ES, TH, SH)": "Emergency Shelter, Transitional, Safe Haven Beds"},
-                                      value="Total Year-Round Beds (ES, TH, SH)"),
+                                      value="Total Year-Round Beds (PSH)"),
+                    html.H4(id="definitions_title", className="m-2", children="Definitions of Shelter Types"),
+                    html.P(
+                        id="definition_text",
+                        className="m-2",
+                        children=[
+                            html.B("Permanent Supportive Housing (PSH):"),
+                            " Long-term housing with ongoing supportive services to help people with disabilities, chronic health issues, or other challenges maintain housing stability.",
+                            html.Br(),
+                            html.B("Other Permanent Housing (OPH):"),
+                            " Long-term housing options not designated as PSH but still provide stability without a time limit (e.g., subsidized housing, housing vouchers).",
+                            html.Br(),
+                            html.B("Year Round Rapid Rehousing (RRH):"),
+                            " Assistance to quickly move people experiencing homelessness into permanent housing through financial aid and short-term support services.",
+                            html.Br(),
+                            html.B(
+                                "Emergency Shelter, Transitional, Safe Haven Beds (ES, TH, SH):"),
+                            " Temporary, immediate shelter (ES); short-term housing with supportive services focused on moving to permanent housing (TH); and low-barrier, 24/7 shelter for individuals who are often unsheltered and have severe needs (SH).",
+                        ]
+                    ),
                     html.Hr(),
                     dcc.Graph(id="stacked_bar1", figure=figures.stack_bargraph1()),
                 ]
