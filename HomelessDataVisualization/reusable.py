@@ -40,8 +40,8 @@ def NamedDropdown(name, **kwargs):
     return html.Div(
         style={"padding": "10px 10px 10px 4px"},
         children=[
-            html.P(children=f"{name}:", style={"margin": "1px", "textAlign": "center"}),
-            dcc.Dropdown(**kwargs, style={"width": "80%", "margin": "0 auto"}),
+            html.P(children=f"{name}:", style={"margin": "2px", "textAlign": "center"}),
+            dcc.Dropdown(**kwargs, style={"width": "80%", "margin": "0 auto", "borderColor": "rgb(232,183,78)"}),
         ],
     )
 

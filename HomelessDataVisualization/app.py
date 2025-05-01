@@ -79,24 +79,24 @@ app.layout = html.Div(className="app-container", children=[
                                                "Total Year-Round Beds (ES, TH, SH)": "Emergency Shelter, Transitional, Safe Haven Beds"},
                                       value="Total Year-Round Beds (PSH)"),
                     html.H4(id="definitions_title", className="m-2", children="Definitions of Shelter Types"),
-                    html.P(
-                        id="definition_text",
-                        className="m-2",
-                        children=[
-                            html.B("Permanent Supportive Housing (PSH):"),
-                            " Long-term housing with ongoing supportive services to help people with disabilities, chronic health issues, or other challenges maintain housing stability.",
-                            html.Br(),
-                            html.B("Other Permanent Housing (OPH):"),
-                            " Long-term housing options not designated as PSH but still provide stability without a time limit (e.g., subsidized housing, housing vouchers).",
-                            html.Br(),
-                            html.B("Year Round Rapid Rehousing (RRH):"),
-                            " Assistance to quickly move people experiencing homelessness into permanent housing through financial aid and short-term support services.",
-                            html.Br(),
-                            html.B(
-                                "Emergency Shelter, Transitional, Safe Haven Beds (ES, TH, SH):"),
-                            " Temporary, immediate shelter (ES); short-term housing with supportive services focused on moving to permanent housing (TH); and low-barrier, 24/7 shelter for individuals who are often unsheltered and have severe needs (SH).",
-                        ]
-                    ),
+                    html.Ul([
+                        html.Li([
+                            html.B("Permanent Supportive Housing (PSH): "),
+                            "Long-term housing with ongoing supportive services to help people with disabilities, chronic health issues, or other challenges maintain housing stability."
+                        ]),
+                        html.Li([
+                            html.B("Other Permanent Housing (OPH): "),
+                            "Long-term housing options not designated as PSH but still provide stability without a time limit (e.g., subsidized housing, housing vouchers)."
+                        ]),
+                        html.Li([
+                            html.B("Year Round Rapid Rehousing (RRH): "),
+                            "Assistance to quickly move people experiencing homelessness into permanent housing through financial aid and short-term support services."
+                        ]),
+                        html.Li([
+                            html.B("Emergency Shelter, Transitional, Safe Haven Beds (ES, TH, SH): "),
+                            "Temporary, immediate shelter (ES); short-term housing with supportive services focused on moving to permanent housing (TH); and low-barrier, 24/7 shelter for individuals who are often unsheltered and have severe needs (SH)."
+                        ])
+                    ]),
                     html.Hr(),
                     dcc.Graph(id="stacked_bar1", figure=figures.stack_bargraph1()),
                 ]
@@ -118,9 +118,9 @@ app.layout = html.Div(className="app-container", children=[
                     dcc.Graph(id="death_graph", figure=figures.death_graph()),
                     html.Hr(),
                     dcc.Graph(id="mortality_projection"),
-                    html.P(id="disclaimer", style={"margin": 2, "fontSize": "12px", "color": "gray"},
-                           children="Note: This model assumes that the counties will behave similarly and is meant to be an estimate"),
-                    html.Div(id="output_metrics", style={"margin": 10, "fontSize": "17px", "textAlign": "center"}),
+                    html.Div(id="disclaimer", style={"marginLeft": "20px", "fontSize": "12px", "color": "gray"},
+                             children="Note: This model assumes that the counties will behave similarly and is meant to be an estimate"),
+                    html.Div(id="output_metrics", style={"margin": 10, "fontSize": "22px", "textAlign": "center"}),
                     drc.NamedSlider(
                         id="shelter_rate_slider",
                         name="Select Sheltered Percentage",
@@ -138,18 +138,23 @@ app.layout = html.Div(className="app-container", children=[
                     "The bottom line is, LA County needs to invest heavily in more shelters to get people off the street "
                     "and into safer environments. Getting people off the streets and mandating treatment will save many "
                     "lives, as we have already seen in New York. Scan the QR Code below to let City Controller Kenneth Mejia "
-                    "know that you want more funding to be used to build more shelters. Or send an email manually to",
+                    "know that you want more funding to be used to build more shelters.",
                     html.Br(),
-                    html.Div(
-                        "controller.mejia@lacity.org",
-                        style={"fontWeight": "bold", "fontSize": "24px", "textAlign": "center"}
-                    )
                 ],
+            ),
+            html.Div(
+                "Scan NOW to send a populated email.",
+                style={"fontWeight": "bold", "fontSize": "24px", "textAlign": "center", "margin": "3px"},
             ),
             html.Div(
                 children=html.Img(src="/assets/qrcode.png", style={"width": "70%", "marginBottom": "2px"}),
                 style={"display": "flex", "justifyContent": "center", "alignItems": "center"}
             ),
+            html.Div(
+                "Or manually send an email to: "
+                "controller.mejia@lacity.org",
+                style={"fontWeight": "bold", "fontSize": "24px", "textAlign": "center", "margin": "3px"},
+            )
         ], width=8)
     ], justify="center"),
     html.Footer(

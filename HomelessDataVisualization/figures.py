@@ -124,64 +124,6 @@ def comparison_visual1(df=PIT_data):
     return fig
 
 
-def us_percapita_homeless():
-    fig = go.Figure()
-    df_us_pop = pd.read_excel("Data/US_Population.xlsx")
-    df_us_homeless = pd.read_excel("Data/Nationwide_Homeless.xlsx")
-
-    # Merge and calculate per capita
-    df_us_pop = df_us_pop.merge(df_us_homeless, on="Year", suffixes=("", "_pop"))
-    df_us_pop["Per Capita Homeless"] = round(
-        (df_us_pop["Estimated Homeless Population"] / df_us_pop["Population"]) * 100000, 0)
-
-    # Add slope line
-    add_scatter(fig, df_us_pop, "Year", "Per Capita Homeless", "US Per Capita Homeless", "black", width=4,
-                textposition="top center")
-
-    base_style = {
-        "xref": "x",
-        "yref": "y",
-        "showarrow": False,
-        "arrowhead": 2,
-        "font": dict(size=12, color="black"),
-        "bgcolor": "white",
-        "bordercolor": "white",
-        "borderwidth": 0.5
-    }
-
-    fig.update_layout(
-        title="Homelessness Increases 25% in the US Over Last Decade",
-        template="plotly_white",
-        xaxis=dict(
-            title="Year",
-            # tickvals=[2014, 2024],
-            showline=True,
-            showgrid=False,
-            linecolor="lightgray",
-            linewidth=1,
-            dtick=1
-        ),
-        yaxis=dict(
-            title="Homeless per 100k People",
-            range=[0, round(df_us_pop["Per Capita Homeless"].max() * 1.25, 0)],
-            gridcolor="lightgray",
-            showgrid=True,
-            showline=True,
-            linecolor="lightgray",
-            linewidth=1,
-        ),
-        legend=dict(
-            orientation="h",  # Horizontal legend
-            x=0.5,  # Center it horizontally
-            y=-0.2,  # Move it below the x-axis (negative y)
-            xanchor="center",  # Anchor x at the center of the legend
-            yanchor="top"  # Anchor y at the top of the legend box
-        ),
-    )
-
-    return fig
-
-
 def shelter_comparison(segment):
     df = HIC_data
 
@@ -208,10 +150,8 @@ def shelter_comparison(segment):
 
     # Create a figure for a line chart
     fig = go.Figure()
-
-    add_scatter(fig, df_ca, "Year", f"{segment} Per Capita", f"LA County", "rgb(232,183,78)", width=4)
     add_scatter(fig, df_ny, "Year", f"{segment} Per Capita", f"NY City County", "rgb(32,72,88)", width=4)
-
+    add_scatter(fig, df_ca, "Year", f"{segment} Per Capita", f"LA County", "rgb(232,183,78)", width=4)
     # Update the layout with a title and axis labels
     fig.update_layout(
         title="NY County's Resources Dwarf LA's",
